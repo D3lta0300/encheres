@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -113,5 +114,22 @@ public class bdd {
         } catch (SQLException ex) {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public static String[] textUser(){
+        String[] out = new String[5];
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Quel est votre nom ? ");
+        out[0]=scanner.nextLine();
+        System.out.println("Quel est votre prénom ? ");
+        out[1]=scanner.nextLine();
+        System.out.println("Quel est votre email ? ");
+        out[2]=scanner.nextLine();
+        System.out.println("Quel est votre mot de passe ? ");
+        out[3]=scanner.nextLine();
+        System.out.println("Quel est votre code postal ? ");
+        out[4]=scanner.nextLine();
+        scanner.close();
+        return out;
     }
 }
