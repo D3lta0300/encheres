@@ -6,6 +6,7 @@ package fr.insa.titouan.encheres;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
@@ -71,6 +72,7 @@ public class bdd {
             con.setAutoCommit(true);
         }
     }
+
     public static void deleteTable(Connection con)
             throws SQLException {
         // je veux que le schema soit entierement crÃ©Ã© ou pas du tout
@@ -79,7 +81,7 @@ public class bdd {
         try ( Statement st = con.createStatement()) {
             // creation des tables
             st.executeUpdate(
-                   """
+                    """
                     drop table Clients
                     """);
             System.out.println("flaaaag");
@@ -115,21 +117,38 @@ public class bdd {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public static String[] textUser(){
+
+    public static String[] textUser() {
         String[] out = new String[5];
         Scanner scanner = new Scanner(System.in);
         System.out.println("Quel est votre nom ? ");
-        out[0]=scanner.nextLine();
+        out[0] = scanner.nextLine();
         System.out.println("Quel est votre prénom ? ");
-        out[1]=scanner.nextLine();
+        out[1] = scanner.nextLine();
         System.out.println("Quel est votre email ? ");
-        out[2]=scanner.nextLine();
+        out[2] = scanner.nextLine();
         System.out.println("Quel est votre mot de passe ? ");
-        out[3]=scanner.nextLine();
+        out[3] = scanner.nextLine();
         System.out.println("Quel est votre code postal ? ");
-        out[4]=scanner.nextLine();
+        out[4] = scanner.nextLine();
         scanner.close();
         return out;
+    }
+
+    public static void addUser(Connection con, String[] user) throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                insert into users (nom,prenom,email,pw,codepostal)
+                values (?,?,?,?,?)
+                """)) {
+            pst.setString(1, user[0]);
+            pst.setString(2, user[1]);
+            pst.setString(3, user[2]);
+            pst.setString(4, user[3]);
+            pst.setInt(5, Integer.parseInt(user[4]));
+            pst.executeUpdate();
+        }
+
     }
 }
