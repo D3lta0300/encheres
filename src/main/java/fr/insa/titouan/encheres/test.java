@@ -4,7 +4,7 @@
  */
 package fr.insa.titouan.encheres;
 
-import static fr.insa.titouan.encheres.bdd.creeSchema;
+import static fr.insa.titouan.encheres.bdd.createSchema;
 import static fr.insa.titouan.encheres.bdd.defaultConnect;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,12 +23,18 @@ public class test {
             Connection con = defaultConnect();
             System.out.println("Link is sucessfully etablished");
 
+            
+            //bdd.createTestTable(con);
+            /*
             String[] test = bdd.textUser();
             for (String i : test) {
                 System.out.println(i);
             }
             bdd.addUser(con, test);
-
+            */
+            
+            bdd.afficheToutesPersonnes(con);
+            
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
