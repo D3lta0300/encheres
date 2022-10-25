@@ -262,18 +262,32 @@ public class bdd {
 
     }
 
-    public static void afficheToutesPersonnes(Connection con)
-            throws SQLException {
+    public static void showUsers(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("select * from test");
-            System.out.println("sélection réalisée");
+            ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM test");
+            int i=1;
             while (res.next()) {
-                // on peut accéder à une colonne par son nom
-                System.out.println("Nouvelle ligne");
-                System.out.println(res.getString("nom"));
+                System.out.println(res.getInt("id") + " : " + res.getString("ez") + ";");
+                i++;
             }
-            System.out.println("Tout les éléments sont passés");
         }
+    }
+    
+    public static String chooseUser(Connection con) throws SQLException {
+        System.out.println("Quel utilisateurs voulez vous sélectionner ? (entrer son numéro)");
+        showUsers(con);
+        Scanner scanner = new Scanner(System.in);
+        int id = scanner.nextInt();
+        String out = "There is an error.";
+        try ( Statement st = con.createStatement()) {
+            ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM test");
+            while (res.next()) {
+                if (res.getInt("id")==id){
+                    out = res.getString("ez");
+                }
+            }
+        }
+        return out;
     }
 
 }
