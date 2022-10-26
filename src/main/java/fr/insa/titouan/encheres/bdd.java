@@ -13,6 +13,8 @@ import java.sql.Statement;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 /**
  *
@@ -20,9 +22,7 @@ import java.util.logging.Logger;
  */
 public class bdd {
 
-    public static Connection connectGeneralPostGres(String host,
-            int port, String database,
-            String user, String pass)
+    public static Connection connectGeneralPostGres(String host, int port, String database, String user, String pass)
             throws ClassNotFoundException, SQLException {
         Class.forName("org.postgresql.Driver");
         Connection con = DriverManager.getConnection(
@@ -33,8 +33,7 @@ public class bdd {
         return con;
     }
 
-    public static Connection defaultConnect()
-            throws ClassNotFoundException, SQLException {
+    public static Connection defaultConnect() throws ClassNotFoundException, SQLException {
         return connectGeneralPostGres("130.185.188.185", 5432, "postgres", "postgres", "root");
     }
 
@@ -47,10 +46,9 @@ public class bdd {
             st.executeUpdate(
                     """
                     CREATE TABLE clients(
-                        id integer not null primary key
-                        generated always as identity,
-                        nom varchar(30) not null unique,
-                        pass varchar(30) not null
+                        id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                        nom VARCHAR(30) NOT NULL UNIQUE,
+                        pass VACHAR(30) NOT NULL
                     )
                     """);
 
@@ -100,7 +98,6 @@ public class bdd {
             con.commit();
             // je retourne dans le mode par défaut de gestion des transaction :
             // chaque ordre au SGBD sera considéré comme une transaction indépendante
-            con.setAutoCommit(true);
         } catch (SQLException ex) {
             // quelque chose s'est mal passé
             // j'annule la transaction
@@ -115,10 +112,7 @@ public class bdd {
         }
     }
 
-    public static void createTestTable(Connection con)
-            throws SQLException {
-        // je veux que le schema soit entierement créé ou pas du tout
-        // je vais donc gérer explicitement une transaction
+    public static void createTestTable(Connection con) throws SQLException {
         con.setAutoCommit(false);
         try ( Statement st = con.createStatement()) {
             // creation des tables
@@ -134,31 +128,21 @@ public class bdd {
                         codepostal varchar(64)
                     )
                     """);
-            // si j'arrive jusqu'ici, c'est que tout s'est bien passé
-            // je confirme (commit) la transaction
             con.commit();
             System.out.println("table créée");
-            // je retourne dans le mode par défaut de gestion des transaction :
-            // chaque ordre au SGBD sera considéré comme une transaction indépendante
             con.setAutoCommit(true);
         } catch (SQLException ex) {
-            // quelque chose s'est mal passé
-            // j'annule la transaction
             con.rollback();
             System.out.println("Il y a eu une erreur, table non créée.");
-            // puis je renvoie l'exeption pour qu'elle puisse éventuellement
-            // àªtre gérée (message à  l'utilisateur...)
             throw ex;
         } finally {
-            // je reviens à  la gestion par défaut : une transaction pour
-            // chaque ordre SQL
             con.setAutoCommit(true);
         }
     }
-    
-    public static void clearTables(Connection con) throws SQLException{
+
+    public static void clearTables(Connection con) throws SQLException {
         con.setAutoCommit(false);
-        try (Statement st = con.createStatement()){
+        try ( Statement st = con.createStatement()) {
             st.executeUpdate("""
                              DROP TABLE bids
                              """);
@@ -174,14 +158,14 @@ public class bdd {
             st.executeUpdate("""
                              DROP TABLE users
                              """);
-        } catch(SQLException ex){
+        } catch (SQLException ex) {
             con.rollback();
             throw ex;
         } finally {
             con.setAutoCommit(true);
         }
     }
-    
+
     public static void deleteTable(Connection con)
             throws SQLException {
         // je veux que le schema soit entierement créé ou pas du tout
@@ -229,7 +213,7 @@ public class bdd {
 
     public static String[] textUser() {
         String[] out = new String[5];
-        try (Scanner scanner = new Scanner(System.in)) {
+        try ( Scanner scanner = new Scanner(System.in)) {
             System.out.println("Quel est votre nom ? ");
             out[0] = scanner.nextLine();
             System.out.println("Quel est votre prénom ? ");
@@ -245,7 +229,6 @@ public class bdd {
     }
 
     public static void addUser(Connection con, String[] user) throws SQLException {
-        con.setAutoCommit(false);
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 insert into test (nom,prenom,email,pw,codepostal)
@@ -259,35 +242,82 @@ public class bdd {
             pst.executeUpdate();
             System.out.println("user added");
         }
-
     }
 
     public static void showUsers(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM test");
-            int i=1;
+            ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM users");
+            int i = 1;
             while (res.next()) {
                 System.out.println(res.getInt("id") + " : " + res.getString("ez") + ";");
                 i++;
             }
         }
     }
-    
-    public static String chooseUser(Connection con) throws SQLException {
-        System.out.println("Quel utilisateurs voulez vous sélectionner ? (entrer son numéro)");
+
+    public static int chooseUser(Connection con) throws SQLException {
+        System.out.println("Qui êtes vous ? (entrer votre numéro)");
         showUsers(con);
         Scanner scanner = new Scanner(System.in);
-        int id = scanner.nextInt();
-        String out = "There is an error.";
+        return scanner.nextInt();
+    }
+
+    public static void showCategories(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM test");
+            ResultSet res = st.executeQuery("SELECT id,name FROM categories");
+            int i = 1;
             while (res.next()) {
-                if (res.getInt("id")==id){
-                    out = res.getString("ez");
-                }
+                System.out.println(res.getInt("id") + " : " + res.getString("name") + ";");
+                i++;
             }
         }
-        return out;
+    }
+
+    public static int chooseCategorie(Connection con) throws SQLException {
+        System.out.println("Quel catégorie souhaitez vous ? (entrer son numéro)");
+        showCategories(con);
+        Scanner scanner = new Scanner(System.in);
+        return scanner.nextInt();
+    }
+
+    public static void createObject(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID) throws SQLException {
+        con.setAutoCommit(false);
+        try ( PreparedStatement pst = con.prepareStatement(
+                """
+                INSERT INTO objects (title,description,start,end,initial_price,category,created_by)
+                values (?,?,?,?,?,?,?)
+                """)) {
+            pst.setString(1, title);
+            pst.setString(2, description);
+            pst.setTimestamp(3, Timestamp.from(Instant.now()));
+            pst.setTimestamp(4, end);
+            pst.setInt(5, initial_price);
+            pst.setInt(6, categoryID);
+            pst.setInt(7, userID);
+            pst.executeUpdate();
+            System.out.println("System : user added");
+        }
+        con.setAutoCommit(true);
+    }
+
+    public static void textObject(Connection con) throws SQLException{
+        Scanner scanner = new Scanner(System.in);
+        int userID = chooseUser(con);
+        System.out.println("Que vendez vous ? ");
+        String title = scanner.nextLine();
+        int categoryID = chooseCategorie(con);
+        System.out.println("Décrivez votre objet : ");
+        String description = scanner.nextLine();
+        System.out.println("A quel prix doivent démarrer les enchères ? ");
+        int initial_price = scanner.nextInt();
+        System.out.println("Quand doit se terminer l'enchère ? (entrer sous la ofrme 'année-mois-jour heure:minute:seconde'");
+        Timestamp end = Timestamp.valueOf(scanner.nextLine());
+        createObject(con, title, description, end, initial_price, userID, categoryID);
+    }
+    
+    public static void textInterface() throws SQLException{
+        Connection con = defaultConnect();
+        
     }
 
 }
