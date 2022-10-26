@@ -244,6 +244,18 @@ public class bdd {
         }
     }
 
+    
+    public static void showObjects(Connection con) throws SQLException {
+        try ( Statement st = con.createStatement()) {
+            ResultSet res = st.executeQuery("SELECT id, FROM users");
+            int i = 1;
+            while (res.next()) {
+                System.out.println(res.getInt("id") + " : " + res.getString("ez") + ";");
+                i++;
+            }
+        }
+    }
+    
     public static void showUsers(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM users");
@@ -300,7 +312,7 @@ public class bdd {
         con.setAutoCommit(true);
     }
 
-    public static void textObject(Connection con) throws SQLException{
+    public static void textObject(Connection con) throws SQLException {
         Scanner scanner = new Scanner(System.in);
         int userID = chooseUser(con);
         System.out.println("Que vendez vous ? ");
@@ -314,10 +326,51 @@ public class bdd {
         Timestamp end = Timestamp.valueOf(scanner.nextLine());
         createObject(con, title, description, end, initial_price, userID, categoryID);
     }
-    
-    public static void textInterface() throws SQLException{
-        Connection con = defaultConnect();
-        
-    }
 
+    public static void textInterface() throws SQLException {
+
+        try ( Connection con = defaultConnect()) {
+            int choice = 1;
+            while (choice != 0) {
+                System.out.println("Bienvenue dans l'interface textuelle du site de l'enchere.");
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("Que souhaitez vous faire ? ");
+                System.out.println("1 : créer un nouvel utilisateur.");
+                System.out.println("2 : recréer les schemas de BDD.");
+                System.out.println("3 : se connecter en tant qu'utilisateur.");
+                choice = scanner.nextInt();
+
+                switch (choice) {
+                    case 1 -> addUser(con, textUser());
+                    case 2 -> {
+                        deleteTable(con);
+                        createSchema(con);
+                    }
+                    case 3 -> {
+                        int userID = chooseUser(con);
+                        while (choice != 0) {
+                            System.out.println("Que souhaitez vous faire ? ");
+                            System.out.println("1 : Créer un objet.");
+                            System.out.println("2 : Créer une enchère. ");
+                            System.out.println("3 : Afficher les enchères.");
+                            System.out.println("4 : Afficher tous les objets.");
+                            choice = scanner.nextInt();
+                            switch(choice){
+                                case 1 -> textObject(con);
+                                case 2 -> System.out.println("not done");
+                                case 3 -> System.out.println("not done yet");
+                                case 4 -> showObjects(con);
+                            }
+                        }
+                        choice = 1;
+                    }
+                    default -> {
+                    }
+                }
+            }
+
+        } catch (ClassNotFoundException | SQLException ex) {
+            Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
