@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 
 /**
  *
@@ -317,6 +318,28 @@ public class bdd {
     
     public static void textInterface() throws SQLException{
         Connection con = defaultConnect();
+    }
+    
+    public static void userBilan() throws SQLException{
+        
+    }
+    
+    public static ArrayList<String> getAllTableNames(Connection con) throws SQLException{
+        ResultSet rs =  con.createStatement().executeQuery("""
+ SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'information_schema' AND schemaname != 'pg_catalog'                                                 
+                                                  """);
+        ArrayList<String> A = new ArrayList <>();
+        while(rs.next()){
+            A.add(rs.getString("tablename"));
+        }
+        return A;
+    }
+    
+    public static ResultSet getAllRelations(Connection con){
+        
+    }
+    
+    public static void deleteAll(String[] args) {
         
     }
 
