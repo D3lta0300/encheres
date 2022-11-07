@@ -43,15 +43,6 @@ public class bdd {
         con.setAutoCommit(false);
         try ( Statement st = con.createStatement()) {
             // creation des tables
-            st.executeUpdate(
-                    """
-                    CREATE TABLE clients(
-                        id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                        nom VARCHAR(30) NOT NULL UNIQUE,
-                        pass VARCHAR(30) NOT NULL
-                    )
-                    """);
-
             st.executeUpdate("""
                              CREATE TABLE objects(
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
@@ -228,19 +219,22 @@ public class bdd {
         return out;
     }
 
-    public static void addUser(Connection con, String[] user) throws SQLException {
+    public static int addUser(Connection con, String[] user) throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 insert into users (nom,prenom,email,pw,codepostal)
                 values (?,?,?,?,?)
-                """)) {
+                """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, user[0]);
             pst.setString(2, user[1]);
             pst.setString(3, user[2]);
             pst.setString(4, user[3]);
             pst.setString(5, user[4]);
             pst.executeUpdate();
+            ResultSet uID = pst.getGeneratedKeys();
+            uID.next();
             System.out.println("user added");
+            return uID.getInt(1);
         }
     }
 
@@ -289,13 +283,22 @@ public class bdd {
         return scanner.nextInt();
     }
 
-    public static void createObject(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID) throws SQLException {
+    public static int addCategory(Connection con, String catName) throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement("INSERT INTO categories (name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
+            pst.setString(1, catName);
+            ResultSet catID = pst.getGeneratedKeys();
+            catID.next();
+            return catID.getInt(1);
+        }
+    }
+
+    public static int addObject(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 INSERT INTO objects (title,description,start_bids,end_bids,initial_price,category,created_by)
-                values (?,?,?,?,?,?,?)
-                """)) {
+                VALUES (?,?,?,?,?,?,?)
+                """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, title);
             pst.setString(2, description);
             pst.setTimestamp(3, Timestamp.from(Instant.now()));
@@ -305,8 +308,12 @@ public class bdd {
             pst.setInt(7, userID);
             pst.executeUpdate();
             System.out.println("System : user added");
+            ResultSet oID = pst.getGeneratedKeys();
+            oID.next();
+            return oID.getInt(1);
+        } finally {
+            con.setAutoCommit(true);
         }
-        con.setAutoCommit(true);
     }
 
     public static void textObject(Connection con) throws SQLException {
@@ -321,7 +328,22 @@ public class bdd {
         int initial_price = scanner.nextInt();
         System.out.println("Quand doit se terminer l'enchère ? (entrer sous la ofrme 'année-mois-jour heure:minute:seconde'");
         Timestamp end = Timestamp.valueOf(scanner.nextLine());
-        createObject(con, title, description, end, initial_price, userID, categoryID);
+        addObject(con, title, description, end, initial_price, userID, categoryID);
+    }
+
+    public static int addBid(Connection con, int userID, int objectID, int value) throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement("""
+                                                         INSERT INTO bids (from_user, on_object, at, value)
+                                                         values (?,?,?,?)
+                                                         """, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            pst.setInt(1, userID);
+            pst.setInt(2, objectID);
+            pst.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+            pst.setInt(4, value);
+            ResultSet bidID = pst.getGeneratedKeys();
+            bidID.next();
+            return bidID.getInt(1);
+        }
     }
 
     public static String listBids(Connection con, int objectID) throws SQLException {
@@ -334,6 +356,30 @@ public class bdd {
             }
         }
         return out;
+    }
+
+    public static void addExample(Connection con) throws SQLException {
+        int[] categories = new int[2];
+        int[] users = new int[3];
+        int[] bids = new int[5];
+        int[] objects = new int[3];
+        try {
+            categories[0] = addCategory(con, "Moustaches");
+            categories[1] = addCategory(con, "Endomorphismes");
+            users[0] = addUser(con, new String[]{"Pelissier","Jean","mail.com","motdp","68007"});
+            users[1] = addUser(con, new String[]{"Plage","Toto","parsols@mer.com","helloWorld","TK8639"});
+            users[2] = addUser(con, new String[]{"Chèvre","Gandolfi","roi.des.vosges@caf.com","helloWorld","TK8639"});
+            objects[0] = addObject(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1]);
+            objects[1] = addObject(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0]);
+            objects[2] = addObject(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0]);
+            bids[0] = addBid(con, users[0], objects[0], 219);
+            bids[1] = addBid(con, users[0], objects[1], 40);
+            bids[2] = addBid(con, users[1], objects[0], 234);
+            bids[3] = addBid(con, users[2], objects[0], 249);
+            bids[4] = addBid(con, users[1], objects[1], 46);
+        } catch (SQLException ex) {
+            throw ex;
+        }
     }
 
     public static void textInterface() throws SQLException {

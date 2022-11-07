@@ -22,16 +22,16 @@ public class test {
         try (Connection con = defaultConnect()){
             System.out.println("Link is sucessfully etablished");
 
-            
+            bdd.createSchema(con);
             //bdd.createTestTable(con);
-            
+            /*
             String[] test = bdd.textUser();
             for (String i : test) {
                 System.out.println(i);
             }
             bdd.addUser(con, test);
             
-            
+*/
             bdd.showUsers(con);
             
         } catch (ClassNotFoundException ex) {
