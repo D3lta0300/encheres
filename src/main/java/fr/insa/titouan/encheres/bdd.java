@@ -48,7 +48,7 @@ public class bdd {
                     CREATE TABLE clients(
                         id INTEGER PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                         nom VARCHAR(30) NOT NULL UNIQUE,
-                        pass VACHAR(30) NOT NULL
+                        pass VARCHAR(30) NOT NULL
                     )
                     """);
 
@@ -57,8 +57,8 @@ public class bdd {
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 title VARCHAR(64) NOT NULL UNIQUE,
                                 description TEXT NOT NULL,
-                                start TIMESTAMP WITHOUT TIME ZONE,
-                                end TIMESTAMP WITHOUT TIME ZONE,
+                                start_bids TIMESTAMP WITHOUT TIME ZONE,
+                                end_bids TIMESTAMP WITHOUT TIME ZONE,
                                 initial_price INTEGER,
                                 category INTEGER,
                                 created_by INTEGER
@@ -70,7 +70,7 @@ public class bdd {
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 from_user INTEGER,
                                 on_object INTEGER,
-                                when TIMESTAMP WITHOUT TIME ZONE,
+                                at TIMESTAMP WITHOUT TIME ZONE,
                                 value INTEGER
                              )
                              """);
@@ -147,13 +147,13 @@ public class bdd {
                              DROP TABLE bids
                              """);
             st.executeUpdate("""
+                             DROP TABLE objects
+                             """);
+            st.executeUpdate("""
                              DROP TABLE categories
                              """);
             st.executeUpdate("""
                              DROP TABLE clients
-                             """);
-            st.executeUpdate("""
-                             DROP TABLE objects
                              """);
             st.executeUpdate("""
                              DROP TABLE users
@@ -231,7 +231,7 @@ public class bdd {
     public static void addUser(Connection con, String[] user) throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                insert into test (nom,prenom,email,pw,codepostal)
+                insert into users (nom,prenom,email,pw,codepostal)
                 values (?,?,?,?,?)
                 """)) {
             pst.setString(1, user[0]);
@@ -244,7 +244,6 @@ public class bdd {
         }
     }
 
-    
     public static void showObjects(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id, FROM users");
@@ -255,7 +254,7 @@ public class bdd {
             }
         }
     }
-    
+
     public static void showUsers(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id,(nom || ' ' || prenom) AS ez FROM users");
@@ -277,10 +276,8 @@ public class bdd {
     public static void showCategories(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id,name FROM categories");
-            int i = 1;
             while (res.next()) {
                 System.out.println(res.getInt("id") + " : " + res.getString("name") + ";");
-                i++;
             }
         }
     }
@@ -296,7 +293,7 @@ public class bdd {
         con.setAutoCommit(false);
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                INSERT INTO objects (title,description,start,end,initial_price,category,created_by)
+                INSERT INTO objects (title,description,start_bids,end_bids,initial_price,category,created_by)
                 values (?,?,?,?,?,?,?)
                 """)) {
             pst.setString(1, title);
@@ -327,6 +324,18 @@ public class bdd {
         createObject(con, title, description, end, initial_price, userID, categoryID);
     }
 
+    public static String listBids(Connection con, int objectID) throws SQLException {
+        String out = "";
+        try ( PreparedStatement pst = con.prepareStatement("SELECT * FROM bids WHERE on_object = ?, ORDER BY value ASC")) {
+            pst.setInt(1, objectID);
+            ResultSet result = pst.executeQuery();
+            while (result.next()) {
+                out += "Enchère de " + result.getInt("from_user") + " à " + result.getInt("value") + "\n";
+            }
+        }
+        return out;
+    }
+
     public static void textInterface() throws SQLException {
 
         try ( Connection con = defaultConnect()) {
@@ -341,7 +350,8 @@ public class bdd {
                 choice = scanner.nextInt();
 
                 switch (choice) {
-                    case 1 -> addUser(con, textUser());
+                    case 1 ->
+                        addUser(con, textUser());
                     case 2 -> {
                         deleteTable(con);
                         createSchema(con);
@@ -355,11 +365,15 @@ public class bdd {
                             System.out.println("3 : Afficher les enchères.");
                             System.out.println("4 : Afficher tous les objets.");
                             choice = scanner.nextInt();
-                            switch(choice){
-                                case 1 -> textObject(con);
-                                case 2 -> System.out.println("not done");
-                                case 3 -> System.out.println("not done yet");
-                                case 4 -> showObjects(con);
+                            switch (choice) {
+                                case 1 ->
+                                    textObject(con);
+                                case 2 ->
+                                    System.out.println("not done");
+                                case 3 ->
+                                    System.out.println("not done yet");
+                                case 4 ->
+                                    showObjects(con);
                             }
                         }
                         choice = 1;
