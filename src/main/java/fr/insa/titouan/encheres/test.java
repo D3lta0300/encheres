@@ -21,7 +21,7 @@ public class test {
 
         try (Connection con = defaultConnect()){
             System.out.println("Link is sucessfully etablished");
-
+            bdd.deleteAllTables();
             
             //bdd.createTestTable(con);
             

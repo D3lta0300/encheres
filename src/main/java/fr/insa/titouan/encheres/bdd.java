@@ -113,105 +113,6 @@ public class bdd {
         }
     }
 
-    public static void createTestTable(Connection con) throws SQLException {
-        con.setAutoCommit(false);
-        try ( Statement st = con.createStatement()) {
-            // creation des tables
-            st.executeUpdate(
-                    """
-                    create table test(
-                        id integer not null primary key
-                        generated always as identity,
-                        nom varchar(64) not null,
-                        prenom varchar(64) not null,
-                        email varchar(64) not null unique,
-                        pw varchar(128) not null,
-                        codepostal varchar(64)
-                    )
-                    """);
-            con.commit();
-            System.out.println("table créée");
-            con.setAutoCommit(true);
-        } catch (SQLException ex) {
-            con.rollback();
-            System.out.println("Il y a eu une erreur, table non créée.");
-            throw ex;
-        } finally {
-            con.setAutoCommit(true);
-        }
-    }
-
-    public static void clearTables(Connection con) throws SQLException {
-        con.setAutoCommit(false);
-        try ( Statement st = con.createStatement()) {
-            st.executeUpdate("""
-                             DROP TABLE bids
-                             """);
-            st.executeUpdate("""
-                             DROP TABLE categories
-                             """);
-            st.executeUpdate("""
-                             DROP TABLE clients
-                             """);
-            st.executeUpdate("""
-                             DROP TABLE objects
-                             """);
-            st.executeUpdate("""
-                             DROP TABLE users
-                             """);
-        } catch (SQLException ex) {
-            con.rollback();
-            throw ex;
-        } finally {
-            con.setAutoCommit(true);
-        }
-    }
-
-    public static void deleteTable(Connection con)
-            throws SQLException {
-        // je veux que le schema soit entierement créé ou pas du tout
-        // je vais donc gérer explicitement une transaction
-        con.setAutoCommit(false);
-        try ( Statement st = con.createStatement()) {
-            // creation des tables
-            st.executeUpdate(
-                    """
-                    drop table Clients
-                    """);
-            System.out.println("table dropped");
-            // si j'arrive jusqu'ici, c'est que tout s'est bien passé
-            // je confirme (commit) la transaction
-            con.commit();
-            // je retourne dans le mode par défaut de gestion des transaction :
-            // chaque ordre au SGBD sera considéré comme une transaction indépendante
-            con.setAutoCommit(true);
-        } catch (SQLException ex) {
-            // quelque chose s'est mal passé
-            // j'annule la transaction
-            con.rollback();
-            // puis je renvoie l'exeption pour qu'elle puisse éventuellement
-            // être gérée (message à  l'utilisateur...)
-            throw ex;
-        } finally {
-            // je reviens à  la gestion par défaut : une transaction pour
-            // chaque ordre SQL
-            con.setAutoCommit(true);
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            Connection con = defaultConnect();
-            System.out.println("Link is sucessfully etablished");
-            createSchema(con);
-            System.out.println("Tables have been created");
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
     public static String[] textUser() {
         String[] out = new String[5];
         try ( Scanner scanner = new Scanner(System.in)) {
@@ -316,7 +217,7 @@ public class bdd {
         createObject(con, title, description, end, initial_price, userID, categoryID);
     }
     
-    public static void textInterface() throws SQLException{
+    public static void textInterface() throws SQLException, ClassNotFoundException{
         Connection con = defaultConnect();
     }
     
@@ -335,12 +236,27 @@ public class bdd {
         return A;
     }
     
-    public static ResultSet getAllRelations(Connection con){
-        
+    public static ArrayList<String> getAllRelationsName(Connection con) throws SQLException{
+        ResultSet rs =  con.createStatement().executeQuery("""
+ SELECT conname FROM pg_catalog.pg_constraint                                                 
+                                                  """);
+        ArrayList<String> A = new ArrayList <>();
+        while(rs.next()){
+            A.add(rs.getString("conname"));
+        }
+        return A;
     }
     
-    public static void deleteAll(String[] args) {
-        
+    public static void deleteAllTables() throws ClassNotFoundException, SQLException {
+        Connection con  = defaultConnect();
+        ArrayList<String> A = getAllTableNames(con);
+        con.setAutoCommit(false);
+        Statement st = con.createStatement();
+        for (int i=0;i<A.size();i++){
+           st.executeUpdate("drop table "+A.get(i));
+           con.commit();
+        }
+        con.setAutoCommit(true);
     }
 
 }
