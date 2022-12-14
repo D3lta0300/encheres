@@ -53,7 +53,8 @@ public class bdd {
                                 end_bids TIMESTAMP WITHOUT TIME ZONE,
                                 initial_price INTEGER,
                                 category INTEGER,
-                                created_by INTEGER
+                                created_by INTEGER,
+                                highest_bid INTEGER
                              )
                              """);
 
@@ -103,7 +104,7 @@ public class bdd {
             con.setAutoCommit(true);
         }
     }
-    
+
     public static String[] textUser() {
         String[] out = new String[5];
         try ( Scanner scanner = new Scanner(System.in)) {
@@ -142,10 +143,10 @@ public class bdd {
 
     public static void showObjects(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("SELECT id, FROM users");
+            ResultSet res = st.executeQuery("SELECT id,title FROM objects");
             int i = 1;
             while (res.next()) {
-                System.out.println(res.getInt("id") + " : " + res.getString("ez") + ";");
+                System.out.println(res.getInt("id") + " : " + res.getString("title") + ";");
                 i++;
             }
         }
@@ -158,6 +159,15 @@ public class bdd {
             while (res.next()) {
                 System.out.println(res.getInt("id") + " : " + res.getString("ez") + ";");
                 i++;
+            }
+        }
+    }
+
+    public static void shwoBids(Connection con) throws SQLException {
+        try ( Statement st = con.createStatement()) {
+            ResultSet res = st.executeQuery("SELECT id, from_use, on_object, at, value FROM bids");
+            while (res.next()) {
+
             }
         }
     }
@@ -188,6 +198,7 @@ public class bdd {
     public static int addCategory(Connection con, String catName) throws SQLException {
         try ( PreparedStatement pst = con.prepareStatement("INSERT INTO categories (name) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, catName);
+            pst.executeUpdate();
             ResultSet catID = pst.getGeneratedKeys();
             catID.next();
             return catID.getInt(1);
@@ -198,8 +209,8 @@ public class bdd {
         con.setAutoCommit(false);
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                INSERT INTO objects (title,description,start_bids,end_bids,initial_price,category,created_by)
-                VALUES (?,?,?,?,?,?,?)
+                INSERT INTO objects (title,description,start_bids,end_bids,initial_price,category,created_by,highest_bid)
+                VALUES (?,?,?,?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, title);
             pst.setString(2, description);
@@ -208,6 +219,7 @@ public class bdd {
             pst.setInt(5, initial_price);
             pst.setInt(6, categoryID);
             pst.setInt(7, userID);
+            pst.setInt(8, initial_price);
             pst.executeUpdate();
             System.out.println("System : user added");
             ResultSet oID = pst.getGeneratedKeys();
@@ -234,50 +246,75 @@ public class bdd {
     }
 
     public static int addBid(Connection con, int userID, int objectID, int value) throws SQLException {
-        try ( PreparedStatement pst = con.prepareStatement("""
-                                                         INSERT INTO bids (from_user, on_object, at, value)
-                                                         values (?,?,?,?)
-                                                         """, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            pst.setInt(1, userID);
-            pst.setInt(2, objectID);
-            pst.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
-            pst.setInt(4, value);
-            ResultSet bidID = pst.getGeneratedKeys();
-            bidID.next();
-            return bidID.getInt(1);
+        con.setAutoCommit(false);
+        try ( PreparedStatement pst = con.prepareStatement("SELECT highest_bid FROM objects WHERE id = ?")) {
+            pst.setInt(1, objectID);
+            ResultSet rst = pst.executeQuery();
+            rst.next();
+            if (rst.getInt("highest_bid") < value) {
+                PreparedStatement pst2 = con.prepareStatement("""
+                                              INSERT INTO bids (from_user, on_object, at, value)
+                                              values (?,?,?,?)
+                                              """, PreparedStatement.RETURN_GENERATED_KEYS);
+                
+                 
+                pst2.setInt(1, userID);
+                pst2.setInt(2, objectID);
+                pst2.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
+                pst2.setInt(4, value);
+                pst2.executeUpdate();
+                ResultSet bidID = pst2.getGeneratedKeys();
+                bidID.next();
+                
+                PreparedStatement pst3 = con.prepareStatement("UPDATE objects SET highest_bid = ? WHERE id = ?");
+                pst3.setInt(1, value);
+                pst3.setInt(2, objectID);
+                pst3.executeUpdate();
+                
+                con.commit();
+                
+                return bidID.getInt(1);
+
+            } else { //si l'enchère proposée est trop faible.
+                con.rollback();
+                return -1; //pas propre comme méthode...
+            }
         }
+        finally {
+            con.setAutoCommit(true);
+        }
+
     }
-    
-    public static ArrayList<String> getAllTableNames(Connection con) throws SQLException{
-        ResultSet rs =  con.createStatement().executeQuery("""
+
+    public static ArrayList<String> getAllTableNames(Connection con) throws SQLException {
+        ResultSet rs = con.createStatement().executeQuery("""
  SELECT tablename FROM pg_catalog.pg_tables WHERE schemaname != 'information_schema' AND schemaname != 'pg_catalog'                                                 
                                                   """);
-        ArrayList<String> A = new ArrayList <>();
-        while(rs.next()){
+        ArrayList<String> A = new ArrayList<>();
+        while (rs.next()) {
             A.add(rs.getString("tablename"));
         }
         return A;
     }
-    
-    public static ArrayList<String> getAllRelationsName(Connection con) throws SQLException{
-        ResultSet rs =  con.createStatement().executeQuery("""
+
+    public static ArrayList<String> getAllRelationsName(Connection con) throws SQLException {
+        ResultSet rs = con.createStatement().executeQuery("""
  SELECT conname FROM pg_catalog.pg_constraint                                                 
                                                   """);
-        ArrayList<String> A = new ArrayList <>();
-        while(rs.next()){
+        ArrayList<String> A = new ArrayList<>();
+        while (rs.next()) {
             A.add(rs.getString("conname"));
         }
         return A;
     }
-    
-    public static void deleteAllTables() throws ClassNotFoundException, SQLException {
-        Connection con  = defaultConnect();
+
+    public static void deleteAllTables(Connection con) throws ClassNotFoundException, SQLException {
         ArrayList<String> A = getAllTableNames(con);
         con.setAutoCommit(false);
         Statement st = con.createStatement();
-        for (int i=0;i<A.size();i++){
-           st.executeUpdate("drop table "+A.get(i));
-           con.commit();
+        for (int i = 0; i < A.size(); i++) {
+            st.executeUpdate("drop table " + A.get(i));
+            con.commit();
         }
         con.setAutoCommit(true);
     }
@@ -290,9 +327,9 @@ public class bdd {
         try {
             categories[0] = addCategory(con, "Moustaches");
             categories[1] = addCategory(con, "Endomorphismes");
-            users[0] = addUser(con, new String[]{"Pelissier","Jean","mail.com","motdp","68007"});
-            users[1] = addUser(con, new String[]{"Plage","Toto","parsols@mer.com","helloWorld","TK8639"});
-            users[2] = addUser(con, new String[]{"Chèvre","Gandolfi","roi.des.vosges@caf.com","helloWorld","TK8639"});
+            users[0] = addUser(con, new String[]{"Pelissier", "Jean", "mail.com", "motdp", "68007"});
+            users[1] = addUser(con, new String[]{"Plage", "Toto", "parsols@mer.com", "helloWorld", "TK8639"});
+            users[2] = addUser(con, new String[]{"Chèvre", "Gandolfi", "roi.des.vosges@caf.com", "helloWorld", "TK8639"});
             objects[0] = addObject(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1]);
             objects[1] = addObject(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0]);
             objects[2] = addObject(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0]);
@@ -323,7 +360,7 @@ public class bdd {
                     case 1 ->
                         addUser(con, textUser());
                     case 2 -> {
-                        deleteTable(con);
+                        deleteAllTables(con);
                         createSchema(con);
                     }
                     case 3 -> {
@@ -338,8 +375,14 @@ public class bdd {
                             switch (choice) {
                                 case 1 ->
                                     textObject(con);
-                                case 2 ->
-                                    System.out.println("not done");
+                                case 2 -> {
+                                    showObjects(con);
+                                    System.out.println("Entrer l'ID de l'objet : ");
+                                    int objectID = scanner.nextInt();
+                                    System.out.println("Quel est votre enchère ?");
+                                    int value = scanner.nextInt();
+                                    addBid(con, userID, objectID, value);
+                                }
                                 case 3 ->
                                     System.out.println("not done yet");
                                 case 4 ->

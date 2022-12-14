@@ -21,16 +21,10 @@ public class test {
 
         try (Connection con = defaultConnect()){
             System.out.println("Link is sucessfully etablished");
-            //bdd.createTestTable(con);
-            /*
-            String[] test = bdd.textUser();
-            for (String i : test) {
-                System.out.println(i);
-            }
-            bdd.addUser(con, test);
-            
-*/
-            bdd.showUsers(con);
+            bdd.deleteAllTables(con);
+            createSchema(con);
+            bdd.addExample(con);
+            bdd.textInterface();
             
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
