@@ -240,7 +240,8 @@ public class bdd {
         String description = scanner.nextLine();
         System.out.println("A quel prix doivent démarrer les enchères ? ");
         int initial_price = scanner.nextInt();
-        System.out.println("Quand doit se terminer l'enchère ? (entrer sous la ofrme 'année-mois-jour heure:minute:seconde'");
+        System.out.println("Quand doit se terminer l'enchère ? (entrer sous la forme 'année-mois-jour heure:minute:seconde'");
+        scanner.nextLine();
         Timestamp end = Timestamp.valueOf(scanner.nextLine());
         addObject(con, title, description, end, initial_price, userID, categoryID);
     }
@@ -313,7 +314,7 @@ public class bdd {
         con.setAutoCommit(false);
         Statement st = con.createStatement();
         for (int i = 0; i < A.size(); i++) {
-            st.executeUpdate("drop table " + A.get(i));
+            st.executeUpdate("drop table " + A.get(i) + " CASCADE");
             con.commit();
         }
         con.setAutoCommit(true);
@@ -355,6 +356,7 @@ public class bdd {
                 System.out.println("2 : recréer les schemas de BDD.");
                 System.out.println("3 : se connecter en tant qu'utilisateur.");
                 choice = scanner.nextInt();
+                scanner.nextLine();
 
                 switch (choice) {
                     case 1 ->
