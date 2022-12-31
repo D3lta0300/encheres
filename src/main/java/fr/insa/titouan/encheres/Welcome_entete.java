@@ -5,6 +5,7 @@
 package fr.insa.titouan.encheres;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -14,19 +15,21 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * @author Titouan
  */
 public class Welcome_entete extends HorizontalLayout {
-    private Label titre;
-    private VuePrincipale main;
     
     public Welcome_entete(VuePrincipale main){
-        this.main = main;
+        this.add(new H1("PN - Enchères"));
         
-        this.titre = new Label("PN - Enchères");
-        this.add(this.titre);
-        
-        Button connect = new Button("connect");
+        Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
             Notification.show("tout casser !!!");
         });
-        this.add(connect);
+        
+        Button createAccount = new Button("Nouvel utilisateur ?");
+        createAccount.addClickListener((event) -> {
+            Notification.show("Vous allez être redirigé vers le formulaire d'inscription.");
+            main.setPrincipal(new CreateAccount(main));
+        });
+        
+        this.add(connect, createAccount);
     }
 }
