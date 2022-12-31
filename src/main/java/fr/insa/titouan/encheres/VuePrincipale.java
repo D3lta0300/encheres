@@ -34,25 +34,30 @@ import com.vaadin.flow.router.Route;
 @Route(value = "")
 @PageTitle("Enchères")
 public class VuePrincipale extends VerticalLayout {
-    
+
     private HorizontalLayout entete;
     private VerticalLayout principal;
-    
+
     public void setEntete(Component c) {
         this.entete.removeAll();
         this.entete.add(c);
     }
-    
+
     public void setPrincipal(Component c) {
         this.principal.removeAll();
         this.principal.add(c);
     }
-    
+
     public VuePrincipale() {
         this.entete = new HorizontalLayout();
         this.entete.setWidthFull();
         this.setEntete(new Welcome_entete(this));
-        this.add(this.entete);
+
+        this.principal = new VerticalLayout();
+        this.principal.setWidthFull();
+        this.principal.setHeightFull();
+
+        this.add(this.entete, this.principal);
     }
-    
+
 }
