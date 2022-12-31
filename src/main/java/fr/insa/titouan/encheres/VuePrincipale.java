@@ -20,10 +20,14 @@ package fr.insa.titouan.encheres;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * vue principale. pour les composants vaadin, voir
@@ -37,6 +41,7 @@ public class VuePrincipale extends VerticalLayout {
 
     private HorizontalLayout entete;
     private VerticalLayout principal;
+    private Session session;
 
     public void setEntete(Component c) {
         this.entete.removeAll();
@@ -47,17 +52,33 @@ public class VuePrincipale extends VerticalLayout {
         this.principal.removeAll();
         this.principal.add(c);
     }
+    
+    public Session getSession(){
+        return this.session;
+    }
 
     public VuePrincipale() {
+        this.session = new Session();
+        
         this.entete = new HorizontalLayout();
         this.entete.setWidthFull();
-        this.setEntete(new Welcome_entete(this));
 
         this.principal = new VerticalLayout();
         this.principal.setWidthFull();
         this.principal.setHeightFull();
 
         this.add(this.entete, this.principal);
+
+        try {
+            session.setCon(bdd.defaultConnect());
+            this.setEntete(new Welcome_entete(this));
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(VuePrincipale.class.getName()).log(Level.SEVERE, null, ex);
+            Notification.show("Something went wrong");
+        } catch (SQLException ex) {
+            Logger.getLogger(VuePrincipale.class.getName()).log(Level.SEVERE, null, ex);
+            Notification.show("Vous n'avez pas accès à la base de donnée");
+        }
     }
 
 }
