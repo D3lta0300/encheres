@@ -16,6 +16,9 @@ import java.util.logging.Logger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  *
@@ -58,7 +61,7 @@ public class bdd {
                                 nom varchar(64) not null,
                                 prenom varchar(64) not null,
                                 email varchar(64) not null unique,
-                                pw varchar(128) not null,
+                                pw varchar(256) not null,
                                 codepostal varchar(64)
                              )
                              """);
@@ -141,7 +144,7 @@ public class bdd {
         return out;
     }
 
-    public static int addUser(Connection con, String[] user) throws SQLException {
+    public static int addUser(Connection con, String[] user) throws SQLException, NoSuchAlgorithmException {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 insert into users (nom,prenom,email,pw,codepostal)
@@ -150,7 +153,7 @@ public class bdd {
             pst.setString(1, user[0]);
             pst.setString(2, user[1]);
             pst.setString(3, user[2]);
-            pst.setString(4, user[3]);
+            pst.setString(4, hashPw(user[3], user[4]));
             pst.setString(5, user[4]);
             pst.executeUpdate();
             ResultSet uID = pst.getGeneratedKeys();
@@ -422,4 +425,14 @@ public class bdd {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public static String hashPw(String pw, String CP) throws NoSuchAlgorithmException {
+        String password = pw+CP;
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(password.getBytes());
+
+        return(hash.toString());
+    }
+    
 }
