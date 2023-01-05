@@ -44,51 +44,7 @@ public class bdd {
         con.setAutoCommit(false);
         try ( Statement st = con.createStatement()) {
             // creation des tables
-            st.executeUpdate("""
-                             CREATE TABLE objects(
-                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                                title VARCHAR(64) NOT NULL UNIQUE,
-                                description TEXT NOT NULL,
-                                start_bids TIMESTAMP WITHOUT TIME ZONE,
-                                end_bids TIMESTAMP WITHOUT TIME ZONE,
-                                initial_price INTEGER,
-                                category INTEGER,
-                                created_by INTEGER,
-                                highest_bid INTEGER
-                                CONSTRAINT fk_obj_user
-                                    FOREIGN KEY(created_by) 
-                                        REFERENCES users(id)
-                                        ON DELETE RESTRICT
-                                        ON UPDATE RESTRICT
-                                CONSTRAINT fk_obj_cat
-                                    FOREIGN KEY(category) 
-                                        REFERENCES categories(id)
-                                        ON DELETE RESTRICT
-                                        ON UPDATE RESTRICT
-                             )
-                             """);
-
-            st.executeUpdate("""
-                             CREATE TABLE bids(
-                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                                from_user INTEGER,
-                                on_object INTEGER,
-                                at TIMESTAMP WITHOUT TIME ZONE,
-                                value INTEGER
-                                CONSTRAINT fk_bids_user
-                                    FOREIGN KEY(from_user) 
-                                    REFERENCES users(id)
-                                    ON DELETE RESTRICT
-                                    ON UPDATE RESTRICT
-                                CONSTRAINT fk_bids_object
-                                    FOREIGN KEY(on_object) 
-                                        REFERENCES objects(id)
-                                        ON DELETE RESTRICT
-                                        ON UPDATE RESTRICT
-                             )
-                             """);
-
-            st.executeUpdate("""
+                        st.executeUpdate("""
                              CREATE TABLE categories(
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 name VARCHAR(64) NOT NULL UNIQUE
@@ -104,6 +60,49 @@ public class bdd {
                                 email varchar(64) not null unique,
                                 pw varchar(128) not null,
                                 codepostal varchar(64)
+                             )
+                             """);
+            st.executeUpdate("""
+                             CREATE TABLE objects(
+                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                                title VARCHAR(64) NOT NULL UNIQUE,
+                                description TEXT NOT NULL,
+                                start_bids TIMESTAMP WITHOUT TIME ZONE,
+                                end_bids TIMESTAMP WITHOUT TIME ZONE,
+                                initial_price INTEGER,
+                                category INTEGER,
+                                created_by INTEGER,
+                                highest_bid INTEGER,
+                                CONSTRAINT fk_obj_user
+                                    FOREIGN KEY(created_by) 
+                                        REFERENCES users(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT,
+                                CONSTRAINT fk_obj_cat
+                                    FOREIGN KEY(category) 
+                                        REFERENCES categories(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
+                             )
+                             """);
+
+            st.executeUpdate("""
+                             CREATE TABLE bids(
+                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                                from_user INTEGER,
+                                on_object INTEGER,
+                                at TIMESTAMP WITHOUT TIME ZONE,
+                                value INTEGER,
+                                CONSTRAINT fk_bids_user
+                                    FOREIGN KEY(from_user) 
+                                    REFERENCES users(id)
+                                    ON DELETE RESTRICT
+                                    ON UPDATE RESTRICT,
+                                CONSTRAINT fk_bids_object
+                                    FOREIGN KEY(on_object) 
+                                        REFERENCES objects(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
                              )
                              """);
             // si j'arrive jusqu'ici, c'est que tout s'est bien passé
@@ -338,6 +337,7 @@ public class bdd {
             con.commit();
         }
         con.setAutoCommit(true);
+        System.out.println("tout drop");
     }
 
     public static void addExample(Connection con) throws SQLException {
