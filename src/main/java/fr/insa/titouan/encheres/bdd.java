@@ -55,6 +55,16 @@ public class bdd {
                                 category INTEGER,
                                 created_by INTEGER,
                                 highest_bid INTEGER
+                                CONSTRAINT fk_obj_user
+                                    FOREIGN KEY(created_by) 
+                                        REFERENCES users(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
+                                CONSTRAINT fk_obj_cat
+                                    FOREIGN KEY(category) 
+                                        REFERENCES categories(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
                              )
                              """);
 
@@ -65,6 +75,16 @@ public class bdd {
                                 on_object INTEGER,
                                 at TIMESTAMP WITHOUT TIME ZONE,
                                 value INTEGER
+                                CONSTRAINT fk_bids_user
+                                    FOREIGN KEY(from_user) 
+                                    REFERENCES users(id)
+                                    ON DELETE RESTRICT
+                                    ON UPDATE RESTRICT
+                                CONSTRAINT fk_bids_object
+                                    FOREIGN KEY(on_object) 
+                                        REFERENCES objects(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
                              )
                              """);
 
