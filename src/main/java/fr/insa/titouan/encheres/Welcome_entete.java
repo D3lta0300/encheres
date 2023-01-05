@@ -8,6 +8,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +39,7 @@ public class Welcome_entete extends HorizontalLayout {
                 bdd.deleteAllTables(main.getSession().getCon());
                 bdd.createSchema(main.getSession().getCon());
                 bdd.addExample(main.getSession().getCon());
-            } catch (ClassNotFoundException | SQLException ex) {
+            } catch (ClassNotFoundException | SQLException | NoSuchAlgorithmException ex) {
                 Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
             }
         });

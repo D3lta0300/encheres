@@ -343,7 +343,7 @@ public class bdd {
         System.out.println("tout drop");
     }
 
-    public static void addExample(Connection con) throws SQLException {
+    public static void addExample(Connection con) throws SQLException, NoSuchAlgorithmException {
         int[] categories = new int[2];
         int[] users = new int[3];
         int[] bids = new int[5];
@@ -367,7 +367,7 @@ public class bdd {
         }
     }
 
-    public static void textInterface() throws SQLException {
+    public static void textInterface() throws SQLException, NoSuchAlgorithmException {
 
         try ( Connection con = defaultConnect()) {
             int choice = 1;
