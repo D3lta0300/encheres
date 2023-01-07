@@ -10,6 +10,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -50,6 +51,8 @@ public class CreateAccount extends FormLayout {
                 } catch (SQLException ex) {
                     Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                     Notification.show("il y a une erreur de BdD");
+                } catch (NoSuchAlgorithmException ex) {
+                    Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 Notification.show("Il y a une erreur dans votre mot de passe.");

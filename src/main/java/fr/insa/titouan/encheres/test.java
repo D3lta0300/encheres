@@ -6,6 +6,7 @@ package fr.insa.titouan.encheres;
 
 import static fr.insa.titouan.encheres.bdd.createSchema;
 import static fr.insa.titouan.encheres.bdd.defaultConnect;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -26,10 +27,10 @@ public class test {
             bdd.addExample(con);
             bdd.textInterface();
             
-        } catch (ClassNotFoundException ex) {
+        } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (SQLException ex) {
-            Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NoSuchAlgorithmException ex) {
+            Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

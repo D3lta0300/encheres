@@ -16,6 +16,9 @@ import java.util.logging.Logger;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  *
@@ -44,31 +47,7 @@ public class bdd {
         con.setAutoCommit(false);
         try ( Statement st = con.createStatement()) {
             // creation des tables
-            st.executeUpdate("""
-                             CREATE TABLE objects(
-                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                                title VARCHAR(64) NOT NULL UNIQUE,
-                                description TEXT NOT NULL,
-                                start_bids TIMESTAMP WITHOUT TIME ZONE,
-                                end_bids TIMESTAMP WITHOUT TIME ZONE,
-                                initial_price INTEGER,
-                                category INTEGER,
-                                created_by INTEGER,
-                                highest_bid INTEGER
-                             )
-                             """);
-
-            st.executeUpdate("""
-                             CREATE TABLE bids(
-                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                                from_user INTEGER,
-                                on_object INTEGER,
-                                at TIMESTAMP WITHOUT TIME ZONE,
-                                value INTEGER
-                             )
-                             """);
-
-            st.executeUpdate("""
+                        st.executeUpdate("""
                              CREATE TABLE categories(
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 name VARCHAR(64) NOT NULL UNIQUE
@@ -82,8 +61,51 @@ public class bdd {
                                 nom varchar(64) not null,
                                 prenom varchar(64) not null,
                                 email varchar(64) not null unique,
-                                pw varchar(128) not null,
+                                pw varchar(256) not null,
                                 codepostal varchar(64)
+                             )
+                             """);
+            st.executeUpdate("""
+                             CREATE TABLE objects(
+                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                                title VARCHAR(64) NOT NULL UNIQUE,
+                                description TEXT NOT NULL,
+                                start_bids TIMESTAMP WITHOUT TIME ZONE,
+                                end_bids TIMESTAMP WITHOUT TIME ZONE,
+                                initial_price INTEGER,
+                                category INTEGER,
+                                created_by INTEGER,
+                                highest_bid INTEGER,
+                                CONSTRAINT fk_obj_user
+                                    FOREIGN KEY(created_by) 
+                                        REFERENCES users(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT,
+                                CONSTRAINT fk_obj_cat
+                                    FOREIGN KEY(category) 
+                                        REFERENCES categories(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
+                             )
+                             """);
+
+            st.executeUpdate("""
+                             CREATE TABLE bids(
+                                id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
+                                from_user INTEGER,
+                                on_object INTEGER,
+                                at TIMESTAMP WITHOUT TIME ZONE,
+                                value INTEGER,
+                                CONSTRAINT fk_bids_user
+                                    FOREIGN KEY(from_user) 
+                                    REFERENCES users(id)
+                                    ON DELETE RESTRICT
+                                    ON UPDATE RESTRICT,
+                                CONSTRAINT fk_bids_object
+                                    FOREIGN KEY(on_object) 
+                                        REFERENCES objects(id)
+                                        ON DELETE RESTRICT
+                                        ON UPDATE RESTRICT
                              )
                              """);
             // si j'arrive jusqu'ici, c'est que tout s'est bien passé
@@ -122,7 +144,7 @@ public class bdd {
         return out;
     }
 
-    public static int addUser(Connection con, String[] user) throws SQLException {
+    public static int addUser(Connection con, String[] user) throws SQLException, NoSuchAlgorithmException {
         try ( PreparedStatement pst = con.prepareStatement(
                 """
                 insert into users (nom,prenom,email,pw,codepostal)
@@ -131,7 +153,7 @@ public class bdd {
             pst.setString(1, user[0]);
             pst.setString(2, user[1]);
             pst.setString(3, user[2]);
-            pst.setString(4, user[3]);
+            pst.setString(4, hashPw(user[3], user[4]));
             pst.setString(5, user[4]);
             pst.executeUpdate();
             ResultSet uID = pst.getGeneratedKeys();
@@ -318,9 +340,10 @@ public class bdd {
             con.commit();
         }
         con.setAutoCommit(true);
+        System.out.println("tout drop");
     }
 
-    public static void addExample(Connection con) throws SQLException {
+    public static void addExample(Connection con) throws SQLException, NoSuchAlgorithmException {
         int[] categories = new int[2];
         int[] users = new int[3];
         int[] bids = new int[5];
@@ -344,7 +367,7 @@ public class bdd {
         }
     }
 
-    public static void textInterface() throws SQLException {
+    public static void textInterface() throws SQLException, NoSuchAlgorithmException {
 
         try ( Connection con = defaultConnect()) {
             int choice = 1;
@@ -402,4 +425,14 @@ public class bdd {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public static String hashPw(String pw, String CP) throws NoSuchAlgorithmException {
+        String password = pw+CP;
+
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        byte[] hash = md.digest(password.getBytes());
+
+        return(hash.toString());
+    }
+    
 }
