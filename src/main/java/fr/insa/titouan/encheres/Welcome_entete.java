@@ -38,6 +38,7 @@ public class Welcome_entete extends HorizontalLayout {
                 bdd.deleteAllTables(main.getSession().getCon());
                 bdd.createSchema(main.getSession().getCon());
                 bdd.addExample(main.getSession().getCon());
+                Notification.show("BdD réinitialisée.");
             } catch (ClassNotFoundException | SQLException ex) {
                 Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
             }
