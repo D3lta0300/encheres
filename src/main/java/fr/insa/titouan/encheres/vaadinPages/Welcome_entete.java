@@ -2,12 +2,13 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package fr.insa.titouan.encheres;
+package fr.insa.titouan.encheres.vaadinPages;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import fr.insa.titouan.encheres.bdd;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -44,7 +45,12 @@ public class Welcome_entete extends HorizontalLayout {
                 Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
+        
+        Button showBids = new Button("Afficher les enchères");
+        showBids.addClickListener((event) -> {
+            main.setPrincipal(new ShowBid(main));
+        });
 
-        this.add(connect, createAccount, reset);
+        this.add(connect, createAccount, reset, showBids);
     }
 }

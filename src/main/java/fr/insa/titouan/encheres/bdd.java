@@ -4,6 +4,7 @@
  */
 package fr.insa.titouan.encheres;
 
+import fr.insa.titouan.encheres.objects.Bid;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -18,7 +19,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -185,13 +186,15 @@ public class bdd {
         }
     }
 
-    public static void shwoBids(Connection con) throws SQLException {
+    public static List<Bid> shwoBids(Connection con) throws SQLException {
+        List<Bid> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id, from_use, on_object, at, value FROM bids");
             while (res.next()) {
-
+                out.add(new Bid(res.getInt("from_use"),res.getInt("on_object"),res.getInt("value"),res.getTimestamp("at")));
             }
         }
+        return out;
     }
 
     public static int chooseUser(Connection con) throws SQLException {

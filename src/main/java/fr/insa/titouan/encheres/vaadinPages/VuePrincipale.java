@@ -16,15 +16,16 @@
     You should have received a copy of the GNU General Public License
     along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
-package fr.insa.titouan.encheres;
+package fr.insa.titouan.encheres.vaadinPages;
 
+import fr.insa.titouan.encheres.objects.Session;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import fr.insa.titouan.encheres.bdd;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
