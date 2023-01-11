@@ -32,7 +32,7 @@ public class CreateAccount extends FormLayout {
     public CreateAccount(VuePrincipale main){
         this.prénom = new TextField("Quel est votre prénom ?");
         this.nom = new TextField("Quel est votre nom ?");
-        this.postalcode = new TextField("Quel est votre code postale ?");
+        this.postalcode = new TextField("Quel est votre code postal ?");
         this.email = new EmailField("Quel est votre adresse mail ?");
         this.pw = new PasswordField("Veuillez choisir un mot de passe :");
         this.verify = new PasswordField("Veuillez confirmer votre mot de passe :");

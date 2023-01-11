@@ -25,6 +25,7 @@ public class Welcome_entete extends HorizontalLayout {
 
         Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
+            main.setPrincipal(new Connection(main));
             Notification.show("tout casser !!!");
         });
 

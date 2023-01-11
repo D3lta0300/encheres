@@ -57,6 +57,9 @@ public class VuePrincipale extends VerticalLayout {
     public Session getSession(){
         return this.session;
     }
+    public void setUser(int id){
+        this.session.setUser(id);
+    }
 
     public VuePrincipale() {
         this.session = new Session();
