@@ -4,7 +4,9 @@
  */
 package fr.insa.titouan.encheres;
 
+import com.vaadin.flow.component.notification.Notification;
 import fr.insa.titouan.encheres.objects.Bid;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,6 +21,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -62,7 +65,7 @@ public class bdd {
                                 nom varchar(64) not null,
                                 prenom varchar(64) not null,
                                 email varchar(64) not null unique,
-                                pw varchar(256) not null,
+                                pw varchar(1023) NOT NULL,
                                 codepostal varchar(64)
                              )
                              """);
@@ -186,7 +189,7 @@ public class bdd {
         }
     }
 
-    public static List<Bid> shwoBids(Connection con) throws SQLException {
+    public static List<Bid> showBids(Connection con) throws SQLException {
         List<Bid> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id, from_use, on_object, at, value FROM bids");
@@ -430,12 +433,47 @@ public class bdd {
     }
 
     public static String hashPw(String pw, String CP) throws NoSuchAlgorithmException {
-        String password = pw+CP;
-
+        String password = pw/*+CP*/;
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte[] hash = md.digest(password.getBytes());
-
-        return(hash.toString());
+        byte [] hash = md.digest(password.getBytes());
+        return new String(hash,Charset.forName("UTF-8"));
     }
     
+    public static boolean userExists(String user) throws SQLException, ClassNotFoundException{
+        Connection con = defaultConnect();
+        Statement st = con.createStatement();
+        ResultSet res = st.executeQuery("SELECT email FROM users");
+        boolean a=false;
+        while (!a&&res.next()){
+            a=user.equals(res.getString("email"));
+        }
+        return a;
+    }
+    
+    public static boolean rightPw(String mail, String pw) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException{
+        Connection con = defaultConnect();
+        Statement st = con.createStatement();
+        ResultSet res = st.executeQuery("SELECT email,codepostal,pw FROM users");
+        boolean a=false;
+        while (!a&&res.next()){
+            if (mail.equals(res.getString("email"))){
+                
+                a=hashPw(pw, res.getString("codepostal")).equals(res.getString("pw"));
+            }
+        }
+        return a;
+    }
+    
+    public static int getUserId(String mail) throws ClassNotFoundException, SQLException{
+        Connection con = defaultConnect();
+        Statement st = con.createStatement();
+        ResultSet res = st.executeQuery("SELECT id,email FROM users");
+        int i=-1;
+        while (res.next()){
+            if (mail.equals(res.getString("email"))){
+                i=res.getInt("id");
+            }
+        }
+        return i;
+    }
 }

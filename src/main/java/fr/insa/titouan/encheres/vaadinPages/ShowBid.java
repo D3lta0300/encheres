@@ -20,7 +20,7 @@ public class ShowBid extends VerticalLayout{
     public ShowBid(VuePrincipale main){
         this.add(new H3("Liste des enchères"));
         try {
-            this.add(new BidList(bdd.shwoBids(main.getSession().getCon())));
+            this.add(new BidList(bdd.showBids(main.getSession().getCon())));
         } catch (SQLException ex) {
             Logger.getLogger(ShowBid.class.getName()).log(Level.SEVERE, null, ex);
         }
