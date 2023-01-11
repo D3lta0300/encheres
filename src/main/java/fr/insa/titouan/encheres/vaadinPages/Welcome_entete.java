@@ -48,9 +48,14 @@ public class Welcome_entete extends HorizontalLayout {
         
         Button showBids = new Button("Afficher les enchères");
         showBids.addClickListener((event) -> {
-            main.setPrincipal(new ShowBid(main));
+            main.setPrincipal(new ShowBids(main));
+        });
+        
+        Button showObjects = new Button("Afficher les objets");
+        showObjects.addClickListener((event)-> {
+            main.setPrincipal(new ShowObjects(main));
         });
 
-        this.add(connect, createAccount, reset, showBids);
+        this.add(connect, createAccount, reset, showBids, showObjects);
     }
 }

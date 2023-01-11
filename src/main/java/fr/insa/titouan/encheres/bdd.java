@@ -4,7 +4,9 @@
  */
 package fr.insa.titouan.encheres;
 
+
 import fr.insa.titouan.encheres.objects.Bid;
+import fr.insa.titouan.encheres.objects.Object;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -164,7 +166,7 @@ public class bdd {
         }
     }
 
-    public static void showObjects(Connection con) throws SQLException {
+    public static void PrintObjects(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("SELECT id,title FROM objects");
             int i = 1;
@@ -186,12 +188,31 @@ public class bdd {
         }
     }
 
-    public static List<Bid> shwoBids(Connection con) throws SQLException {
+    public static List<Bid> showBids(Connection con) throws SQLException {
         List<Bid> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("SELECT id, from_use, on_object, at, value FROM bids");
+            ResultSet res = st.executeQuery("""
+                                            SELECT at, value, (prenom || ' ' || nom) AS nom_complet, title
+                                            FROM bids
+                                            JOIN users ON from_user = users.id
+                                            JOIN objects ON objects.id = on_object
+                                            ORDER BY at ASC""");
             while (res.next()) {
-                out.add(new Bid(res.getInt("from_use"),res.getInt("on_object"),res.getInt("value"),res.getTimestamp("at")));
+                out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("nom_complet"), res.getString("title")));
+            }
+        }
+        return out;
+    }
+    
+    public static List<Object> showObjects(Connection con) throws SQLException {
+        List<Object> out = new ArrayList<>();
+        try ( Statement st = con.createStatement()) {
+            ResultSet res = st.executeQuery("""
+                                            SELECT title, objects.id, (prenom || ' ' || nom) AS nom_complet, highest_bid
+                                            FROM objects
+                                            JOIN users ON created_by = users.id""");
+            while (res.next()) {
+                out.add(new Object(res.getInt("id"), res.getString("title"), res.getString("nom_complet"), res.getInt("highest_bid")));
             }
         }
         return out;
@@ -404,7 +425,7 @@ public class bdd {
                                 case 1 ->
                                     textObject(con);
                                 case 2 -> {
-                                    showObjects(con);
+                                    PrintObjects(con);
                                     System.out.println("Entrer l'ID de l'objet : ");
                                     int objectID = scanner.nextInt();
                                     System.out.println("Quel est votre enchère ?");
@@ -414,7 +435,7 @@ public class bdd {
                                 case 3 ->
                                     System.out.println("not done yet");
                                 case 4 ->
-                                    showObjects(con);
+                                    PrintObjects(con);
                             }
                         }
                         choice = 1;
