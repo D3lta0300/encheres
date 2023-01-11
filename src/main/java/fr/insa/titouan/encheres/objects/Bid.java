@@ -11,32 +11,32 @@ import java.sql.Timestamp;
  * @author Titouan
  */
 public class Bid {
-    private int uId;
-    private int oId;
     private int value;
     private Timestamp time;
+    private String nom_complet;
+    private String object;
 
-    public Bid(int uId, int oId, int value, Timestamp time) {
-        this.uId = uId;
-        this.oId = oId;
+    public Bid(int value, Timestamp time, String nom_complet, String object) {
         this.value = value;
         this.time = time;
+        this.nom_complet = nom_complet;
+        this.object = object;
     }
 
-    public int getuId() {
-        return uId;
+    public String getObject() {
+        return object;
     }
 
-    public void setuId(int uId) {
-        this.uId = uId;
+    public void setObject(String object) {
+        this.object = object;
     }
 
-    public int getoId() {
-        return oId;
+    public String getNom_complet() {
+        return nom_complet;
     }
 
-    public void setoId(int oId) {
-        this.oId = oId;
+    public void setNom_complet(String nom_complet) {
+        this.nom_complet = nom_complet;
     }
 
     public int getValue() {

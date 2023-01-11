@@ -19,10 +19,10 @@ public class BidList extends Grid<Bid> {
     public BidList(List<Bid> bids){
         this.bids = bids;
         
-        Column<Bid> uIds = this.addColumn(Bid::getuId).setHeader("User Id");
-        Column<Bid> oIds = this.addColumn(Bid::getoId).setHeader("Object Id");
-        Column<Bid> values = this.addColumn(Bid::getValue).setHeader("Value");
-        Column<Bid> time = this.addColumn(Bid::getTime).setHeader("Time");
+        Column<Bid> nom_complet = this.addColumn(Bid::getNom_complet).setHeader("Enchère de");
+        Column<Bid> object = this.addColumn(Bid::getObject).setHeader("Sur l'objet");
+        Column<Bid> values = this.addColumn(Bid::getValue).setHeader("Pour une valeur de (€)    ");
+        Column<Bid> time = this.addColumn(Bid::getTime).setHeader("Réalisée à");
         
         this.setItems(this.bids);
         

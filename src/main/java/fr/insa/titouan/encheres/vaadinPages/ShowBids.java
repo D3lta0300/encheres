@@ -15,14 +15,14 @@ import java.util.logging.Logger;
  *
  * @author Titouan
  */
-public class ShowBid extends VerticalLayout{
+public class ShowBids extends VerticalLayout{
     
-    public ShowBid(VuePrincipale main){
+    public ShowBids(VuePrincipale main){
         this.add(new H3("Liste des enchères"));
         try {
             this.add(new BidList(bdd.showBids(main.getSession().getCon())));
         } catch (SQLException ex) {
-            Logger.getLogger(ShowBid.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ShowBids.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
