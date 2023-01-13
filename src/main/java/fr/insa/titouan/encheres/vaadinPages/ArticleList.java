@@ -21,7 +21,7 @@ public class ArticleList extends Grid<Article>{
         
         Grid.Column<Article> id = this.addColumn(Article::getId).setHeader("ID");
         Grid.Column<Article> title = this.addColumn(Article::getTitle).setHeader("Titre");
-        Grid.Column<Article> from = this.addColumn(Article::getFrom_user).setHeader("Proposé par ");
+        Grid.Column<Article> from = this.addColumn(Article::getAuthor).setHeader("Proposé par ");
         Grid.Column<Article> highest_bid = this.addColumn(Article::getHighest_bid).setHeader("Enchère la plus haute (€)");
         
         this.setItems(this.objects);

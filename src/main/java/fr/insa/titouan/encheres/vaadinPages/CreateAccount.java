@@ -5,6 +5,7 @@
 package fr.insa.titouan.encheres.vaadinPages;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -21,6 +22,7 @@ import java.util.logging.Logger;
  * @author Titouan
  */
 public class CreateAccount extends FormLayout {
+
     private TextField nom;
     private TextField prénom;
     private TextField postalcode;
@@ -28,18 +30,21 @@ public class CreateAccount extends FormLayout {
     private PasswordField pw;
     private PasswordField verify;
     private Button send;
-    
-    public CreateAccount(VuePrincipale main){
+
+    public CreateAccount(VuePrincipale main) {
         this.prénom = new TextField("Quel est votre prénom ?");
         this.nom = new TextField("Quel est votre nom ?");
+        this.nom.setRequired(true);
         this.postalcode = new TextField("Quel est votre code postal ?");
         this.email = new EmailField("Quel est votre adresse mail ?");
         this.pw = new PasswordField("Veuillez choisir un mot de passe :");
+        this.pw.setRequired(true);
         this.verify = new PasswordField("Veuillez confirmer votre mot de passe :");
+        this.verify.setRequired(true);
         this.send = new Button("Valider");
-        
-        this.send.addClickListener((event) ->{
-            if (this.pw.getValue().equals(this.verify.getValue())){
+
+        this.send.addClickListener((event) -> {
+            if (this.pw.getValue().equals(this.verify.getValue())) {
                 Notification.show("Votre compte va être créé.");
                 String[] user = new String[5];
                 user[0] = this.nom.getValue();
@@ -59,8 +64,8 @@ public class CreateAccount extends FormLayout {
                 Notification.show("Il y a une erreur dans votre mot de passe.");
             }
         });
-        
-        this.add(this.prénom,this.nom, this.postalcode, this.email, this.pw, this.verify, this.send);
-        
+
+        this.add(this.prénom, this.nom, this.postalcode, this.email, this.pw, this.verify, this.send);
+
     }
 }

@@ -24,13 +24,14 @@ public class ShowArticles extends VerticalLayout {
     ArticleList articles;
     
     public ShowArticles(VuePrincipale main) {
-        this.add(new H3("Liste des objets"));
+        this.add(new H3("Liste des articles"));
         
-        Button validate = new Button ("Valider");
+        Button validate = new Button ("Sélectionner");
         validate.addClickListener((event) -> {
             Set<Article> selected = articles.getSelectedItems();
             for (Article select : selected){
                 Notification.show("L'objet d'id " + select.getId() + " a été sélectionné.");
+                main.setPrincipal(new ArticlePage(select.getId(),main));
             }
         });
         this.add(validate);

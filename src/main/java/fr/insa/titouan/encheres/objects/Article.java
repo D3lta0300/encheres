@@ -11,14 +11,40 @@ package fr.insa.titouan.encheres.objects;
 public class Article {
     private int id;
     private String title;
-    private String from_user;
+    private String author;
     private int highest_bid;
+    private String description;
 
-    public Article(int id, String title, String from_user, int highest_bid) {
+    public Article(int id, String title, String Author, int highest_bid) {
         this.id = id;
         this.title = title;
-        this.from_user = from_user;
+        this.author = Author;
         this.highest_bid = highest_bid;
+        this.description = "";
+    }
+    
+    public Article(int id, String title, String Author, int highest_bid, String description) {
+        this.id = id;
+        this.title = title;
+        this.author = Author;
+        this.highest_bid = highest_bid;
+        this.description = description;
+    }
+    
+    public Article() {
+        this.id = -1;
+        this.title = "";
+        this.author = "";
+        this.highest_bid = -1;
+        this.description = "";
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public int getId() {
@@ -37,12 +63,12 @@ public class Article {
         this.title = title;
     }
 
-    public String getFrom_user() {
-        return from_user;
+    public String getAuthor() {
+        return author;
     }
 
-    public void setFrom_user(String from_user) {
-        this.from_user = from_user;
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     public int getHighest_bid() {

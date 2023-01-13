@@ -194,13 +194,13 @@ public class bdd {
         List<Bid> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("""
-                                            SELECT at, value, (prenom || ' ' || nom) AS nom_complet, title
+                                            SELECT at, value, (prenom || ' ' || nom) AS author, title
                                             FROM bids
                                             JOIN users ON from_user = users.id
                                             JOIN articles ON articles.id = on_article
                                             ORDER BY at ASC""");
             while (res.next()) {
-                out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("nom_complet"), res.getString("title")));
+                out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("author"), res.getString("title")));
             }
         }
         return out;
@@ -210,16 +210,32 @@ public class bdd {
         List<Article> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("""
-                                            SELECT title, articles.id, (prenom || ' ' || nom) AS nom_complet, highest_bid
+                                            SELECT title, articles.id, (prenom || ' ' || nom) AS author, highest_bid
                                             FROM articles
                                             JOIN users ON created_by = users.id""");
             while (res.next()) {
-                out.add(new Article(res.getInt("id"), res.getString("title"), res.getString("nom_complet"), res.getInt("highest_bid")));
+                out.add(new Article(res.getInt("id"), res.getString("title"), res.getString("author"), res.getInt("highest_bid")));
             }
         }
         return out;
     }
 
+    public static Article getArticle(int id, Connection con) throws SQLException{
+        Article out = new Article();
+        try ( Statement st = con.createStatement()) {
+            ResultSet res = st.executeQuery("""
+                                            SELECT title, articles.id, (prenom || ' ' || nom) AS author, highest_bid, description
+                                            FROM articles
+                                            JOIN users ON created_by = users.id
+                                            WHERE articles.id = """ + id);
+            
+            while (res.next()) {
+                out = new Article(res.getInt("id"), res.getString("title"), res.getString("author"), res.getInt("highest_bid"),res.getString("description"));
+            }
+        }
+        return out;
+    }
+    
     public static int chooseUser(Connection con) throws SQLException {
         System.out.println("Qui êtes vous ? (entrer votre numéro)");
         showUsers(con);
