@@ -84,6 +84,7 @@ public class bdd {
                                 category INTEGER,
                                 created_by INTEGER,
                                 highest_bid INTEGER,
+                                image VARCHAR(256),
                                 CONSTRAINT fk_obj_user
                                     FOREIGN KEY(created_by) 
                                         REFERENCES users(id)

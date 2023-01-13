@@ -10,6 +10,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import fr.insa.titouan.encheres.bdd;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,7 +26,7 @@ public class Welcome_entete extends HorizontalLayout {
 
         Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
-            main.setPrincipal(new Connection(main));
+            main.setPrincipal(new Page_connection(main));
             Notification.show("tout casser !!!");
         });
 
@@ -56,7 +57,12 @@ public class Welcome_entete extends HorizontalLayout {
         showObjects.addClickListener((event)-> {
             main.setPrincipal(new ShowObjects(main));
         });
+        
+        Button createObject = new Button("Vendre un objet");
+        createObject.addClickListener((event) -> {
+            main.setPrincipal(new Entrer_Objet(main));
+        });
 
-        this.add(connect, createAccount, reset, showBids, showObjects);
+        this.add(connect, createAccount, reset, showBids, showObjects, createObject);
     }
 }
