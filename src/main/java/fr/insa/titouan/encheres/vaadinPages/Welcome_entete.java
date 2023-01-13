@@ -10,7 +10,6 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import fr.insa.titouan.encheres.bdd;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -27,7 +26,7 @@ public class Welcome_entete extends HorizontalLayout {
         Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
             main.setPrincipal(new Page_connection(main));
-            Notification.show("tout casser !!!");
+            Notification.show("Vous allez être connecté");
         });
 
         Button createAccount = new Button("Nouvel utilisateur ?");

@@ -5,12 +5,10 @@
 package fr.insa.titouan.encheres.vaadinPages;
 
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
-import com.vaadin.flow.component.textfield.TextField;
 import fr.insa.titouan.encheres.bdd;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
