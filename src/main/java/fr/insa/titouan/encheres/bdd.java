@@ -6,10 +6,7 @@ package fr.insa.titouan.encheres;
 
 
 import fr.insa.titouan.encheres.objects.Bid;
-import fr.insa.titouan.encheres.objects.Object;
-import com.vaadin.flow.component.notification.Notification;
-import fr.insa.titouan.encheres.objects.Bid;
-import fr.insa.titouan.encheres.objects.Object;
+import fr.insa.titouan.encheres.objects.Article;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -25,7 +22,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -74,7 +70,7 @@ public class bdd {
                              )
                              """);
             st.executeUpdate("""
-                             CREATE TABLE objects(
+                             CREATE TABLE articles(
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 title VARCHAR(64) NOT NULL UNIQUE,
                                 description TEXT NOT NULL,
@@ -102,7 +98,7 @@ public class bdd {
                              CREATE TABLE bids(
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 from_user INTEGER,
-                                on_object INTEGER,
+                                on_article INTEGER,
                                 at TIMESTAMP WITHOUT TIME ZONE,
                                 value INTEGER,
                                 CONSTRAINT fk_bids_user
@@ -110,9 +106,9 @@ public class bdd {
                                     REFERENCES users(id)
                                     ON DELETE RESTRICT
                                     ON UPDATE RESTRICT,
-                                CONSTRAINT fk_bids_object
-                                    FOREIGN KEY(on_object) 
-                                        REFERENCES objects(id)
+                                CONSTRAINT fk_bids_article
+                                    FOREIGN KEY(on_article) 
+                                        REFERENCES articles(id)
                                         ON DELETE RESTRICT
                                         ON UPDATE RESTRICT
                              )
@@ -172,9 +168,9 @@ public class bdd {
         }
     }
 
-    public static void PrintObjects(Connection con) throws SQLException {
+    public static void PrintArticles(Connection con) throws SQLException {
         try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("SELECT id,title FROM objects");
+            ResultSet res = st.executeQuery("SELECT id,title FROM articles");
             int i = 1;
             while (res.next()) {
                 System.out.println(res.getInt("id") + " : " + res.getString("title") + ";");
@@ -201,7 +197,7 @@ public class bdd {
                                             SELECT at, value, (prenom || ' ' || nom) AS nom_complet, title
                                             FROM bids
                                             JOIN users ON from_user = users.id
-                                            JOIN objects ON objects.id = on_object
+                                            JOIN articles ON articles.id = on_article
                                             ORDER BY at ASC""");
             while (res.next()) {
                 out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("nom_complet"), res.getString("title")));
@@ -210,15 +206,15 @@ public class bdd {
         return out;
     }
     
-    public static List<Object> showObjects(Connection con) throws SQLException {
-        List<Object> out = new ArrayList<>();
+    public static List<Article> showArticles(Connection con) throws SQLException {
+        List<Article> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("""
-                                            SELECT title, objects.id, (prenom || ' ' || nom) AS nom_complet, highest_bid
-                                            FROM objects
+                                            SELECT title, articles.id, (prenom || ' ' || nom) AS nom_complet, highest_bid
+                                            FROM articles
                                             JOIN users ON created_by = users.id""");
             while (res.next()) {
-                out.add(new Object(res.getInt("id"), res.getString("title"), res.getString("nom_complet"), res.getInt("highest_bid")));
+                out.add(new Article(res.getInt("id"), res.getString("title"), res.getString("nom_complet"), res.getInt("highest_bid")));
             }
         }
         return out;
@@ -257,11 +253,11 @@ public class bdd {
         }
     }
 
-    public static int addObject(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID) throws SQLException {
+    public static int addArticle(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                INSERT INTO objects (title,description,start_bids,end_bids,initial_price,category,created_by,highest_bid)
+                INSERT INTO articles (title,description,start_bids,end_bids,initial_price,category,created_by,highest_bid)
                 VALUES (?,?,?,?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, title);
@@ -282,7 +278,7 @@ public class bdd {
         }
     }
 
-    public static void textObject(Connection con) throws SQLException {
+    public static void textArticle(Connection con) throws SQLException {
         Scanner scanner = new Scanner(System.in);
         int userID = chooseUser(con);
         System.out.println("Que vendez vous ? ");
@@ -295,33 +291,33 @@ public class bdd {
         System.out.println("Quand doit se terminer l'enchère ? (entrer sous la forme 'année-mois-jour heure:minute:seconde'");
         scanner.nextLine();
         Timestamp end = Timestamp.valueOf(scanner.nextLine());
-        addObject(con, title, description, end, initial_price, userID, categoryID);
+        addArticle(con, title, description, end, initial_price, userID, categoryID);
     }
 
-    public static int addBid(Connection con, int userID, int objectID, int value) throws SQLException {
+    public static int addBid(Connection con, int userID, int articleID, int value) throws SQLException {
         con.setAutoCommit(false);
-        try ( PreparedStatement pst = con.prepareStatement("SELECT highest_bid FROM objects WHERE id = ?")) {
-            pst.setInt(1, objectID);
+        try ( PreparedStatement pst = con.prepareStatement("SELECT highest_bid FROM articles WHERE id = ?")) {
+            pst.setInt(1, articleID);
             ResultSet rst = pst.executeQuery();
             rst.next();
             if (rst.getInt("highest_bid") < value) {
                 PreparedStatement pst2 = con.prepareStatement("""
-                                              INSERT INTO bids (from_user, on_object, at, value)
+                                              INSERT INTO bids (from_user, on_article, at, value)
                                               values (?,?,?,?)
                                               """, PreparedStatement.RETURN_GENERATED_KEYS);
                 
                  
                 pst2.setInt(1, userID);
-                pst2.setInt(2, objectID);
+                pst2.setInt(2, articleID);
                 pst2.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
                 pst2.setInt(4, value);
                 pst2.executeUpdate();
                 ResultSet bidID = pst2.getGeneratedKeys();
                 bidID.next();
                 
-                PreparedStatement pst3 = con.prepareStatement("UPDATE objects SET highest_bid = ? WHERE id = ?");
+                PreparedStatement pst3 = con.prepareStatement("UPDATE articles SET highest_bid = ? WHERE id = ?");
                 pst3.setInt(1, value);
-                pst3.setInt(2, objectID);
+                pst3.setInt(2, articleID);
                 pst3.executeUpdate();
                 
                 con.commit();
@@ -377,21 +373,21 @@ public class bdd {
         int[] categories = new int[2];
         int[] users = new int[3];
         int[] bids = new int[5];
-        int[] objects = new int[3];
+        int[] articles = new int[3];
         try {
             categories[0] = addCategory(con, "Moustaches");
             categories[1] = addCategory(con, "Endomorphismes");
             users[0] = addUser(con, new String[]{"Pelissier", "Jean", "mail.com", "motdp", "68007"});
             users[1] = addUser(con, new String[]{"Plage", "Toto", "parsols@mer.com", "helloWorld", "TK8639"});
             users[2] = addUser(con, new String[]{"Chèvre", "Gandolfi", "roi.des.vosges@caf.com", "helloWorld", "TK8639"});
-            objects[0] = addObject(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1]);
-            objects[1] = addObject(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0]);
-            objects[2] = addObject(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0]);
-            bids[0] = addBid(con, users[0], objects[0], 219);
-            bids[1] = addBid(con, users[0], objects[1], 40);
-            bids[2] = addBid(con, users[1], objects[0], 234);
-            bids[3] = addBid(con, users[2], objects[0], 249);
-            bids[4] = addBid(con, users[1], objects[1], 46);
+            articles[0] = addArticle(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1]);
+            articles[1] = addArticle(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0]);
+            articles[2] = addArticle(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0]);
+            bids[0] = addBid(con, users[0], articles[0], 219);
+            bids[1] = addBid(con, users[0], articles[1], 40);
+            bids[2] = addBid(con, users[1], articles[0], 234);
+            bids[3] = addBid(con, users[2], articles[0], 249);
+            bids[4] = addBid(con, users[1], articles[1], 46);
         } catch (SQLException ex) {
             throw ex;
         }
@@ -429,19 +425,19 @@ public class bdd {
                             choice = scanner.nextInt();
                             switch (choice) {
                                 case 1 ->
-                                    textObject(con);
+                                    textArticle(con);
                                 case 2 -> {
-                                    PrintObjects(con);
+                                    PrintArticles(con);
                                     System.out.println("Entrer l'ID de l'objet : ");
-                                    int objectID = scanner.nextInt();
+                                    int articleID = scanner.nextInt();
                                     System.out.println("Quel est votre enchère ?");
                                     int value = scanner.nextInt();
-                                    addBid(con, userID, objectID, value);
+                                    addBid(con, userID, articleID, value);
                                 }
                                 case 3 ->
                                     System.out.println("not done yet");
                                 case 4 ->
-                                    PrintObjects(con);
+                                    PrintArticles(con);
                             }
                         }
                         choice = 1;

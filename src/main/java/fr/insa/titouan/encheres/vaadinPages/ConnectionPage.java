@@ -19,12 +19,12 @@ import java.util.logging.Logger;
  *
  * @author Titouan
  */
-public class Page_connection extends VerticalLayout {
+public class ConnectionPage extends VerticalLayout {
     private EmailField email;
     private PasswordField pw;
     private Button send;
     
-    public Page_connection(VuePrincipale main){
+    public ConnectionPage(VuePrincipale main){
         this.email = new EmailField("Quel est votre adresse mail ?");
         this.pw = new PasswordField("Veuillez choisir un mot de passe :");
         this.send = new Button("Valider");
@@ -44,7 +44,7 @@ public class Page_connection extends VerticalLayout {
                     Notification.show("Email non reconnu");
                 }
             } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException ex) {
-                Logger.getLogger(Page_connection.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(ConnectionPage.class.getName()).log(Level.SEVERE, null, ex);
             }
             
         });

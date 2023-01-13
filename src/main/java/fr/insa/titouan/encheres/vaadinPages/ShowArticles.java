@@ -12,30 +12,32 @@ import fr.insa.titouan.encheres.bdd;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import fr.insa.titouan.encheres.objects.Object;
+import fr.insa.titouan.encheres.objects.Article;
 import java.util.Set;
 
 /**
  *
  * @author Titouan
  */
-public class ShowObjects extends VerticalLayout {
+public class ShowArticles extends VerticalLayout {
     
-    ObjectList objects;
+    ArticleList articles;
     
-    public ShowObjects(VuePrincipale main) {
-        this.add(new H3("Liste des enchères"));
+    public ShowArticles(VuePrincipale main) {
+        this.add(new H3("Liste des objets"));
+        
         Button validate = new Button ("Valider");
         validate.addClickListener((event) -> {
-            Set<Object> selected = objects.getSelectedItems();
-            for (Object select : selected){
+            Set<Article> selected = articles.getSelectedItems();
+            for (Article select : selected){
                 Notification.show("L'objet d'id " + select.getId() + " a été sélectionné.");
             }
         });
         this.add(validate);
+        
         try {
-            this.objects = new ObjectList(bdd.showObjects(main.getSession().getCon()));
-            this.add(this.objects);
+            this.articles = new ArticleList(bdd.showArticles(main.getSession().getCon()));
+            this.add(this.articles);
         } catch (SQLException ex) { 
             Logger.getLogger(ShowBids.class.getName()).log(Level.SEVERE, null, ex);
         }

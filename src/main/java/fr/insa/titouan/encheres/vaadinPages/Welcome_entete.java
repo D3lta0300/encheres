@@ -25,7 +25,7 @@ public class Welcome_entete extends HorizontalLayout {
 
         Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
-            main.setPrincipal(new Page_connection(main));
+            main.setPrincipal(new ConnectionPage(main));
             Notification.show("Vous allez être connecté");
         });
 
@@ -54,12 +54,12 @@ public class Welcome_entete extends HorizontalLayout {
         
         Button showObjects = new Button("Afficher les objets");
         showObjects.addClickListener((event)-> {
-            main.setPrincipal(new ShowObjects(main));
+            main.setPrincipal(new ShowArticles(main));
         });
         
         Button createObject = new Button("Vendre un objet");
         createObject.addClickListener((event) -> {
-            main.setPrincipal(new Entrer_Objet(main));
+            main.setPrincipal(new CreateArticle(main));
         });
 
         this.add(connect, createAccount, reset, showBids, showObjects, createObject);

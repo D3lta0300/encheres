@@ -8,13 +8,13 @@ package fr.insa.titouan.encheres.objects;
  *
  * @author Titouan
  */
-public class Object {
+public class Article {
     private int id;
     private String title;
     private String from_user;
     private int highest_bid;
 
-    public Object(int id, String title, String from_user, int highest_bid) {
+    public Article(int id, String title, String from_user, int highest_bid) {
         this.id = id;
         this.title = title;
         this.from_user = from_user;
