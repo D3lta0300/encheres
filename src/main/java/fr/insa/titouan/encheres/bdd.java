@@ -206,6 +206,25 @@ public class bdd {
         return out;
     }
     
+    public static List<Bid> showBidsOnObject(int id, Connection con) throws SQLException {
+        List<Bid> out = new ArrayList<>();
+        try ( PreparedStatement pst = con.prepareStatement("""
+                                                    SELECT at, value, (prenom || ' ' || nom) AS author, title
+                                                    FROM bids
+                                                    JOIN users ON from_user = users.id
+                                                    JOIN articles ON articles.id = on_article
+                                                    WHERE articles.id = ?
+                                                    ORDER BY at ASC
+                                                           """)) {
+            pst.setInt(1, id);
+            ResultSet res = pst.executeQuery();
+            while (res.next()) {
+                out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("author"), res.getString("title")));
+            }
+        }
+        return out;
+    }
+    
     public static List<Article> showArticles(Connection con) throws SQLException {
         List<Article> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
@@ -337,7 +356,6 @@ public class bdd {
                 pst3.executeUpdate();
                 
                 con.commit();
-                
                 return bidID.getInt(1);
 
             } else { //si l'enchère proposée est trop faible.

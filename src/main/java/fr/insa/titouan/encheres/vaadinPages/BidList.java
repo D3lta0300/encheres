@@ -27,4 +27,14 @@ public class BidList extends Grid<Bid> {
         this.setItems(this.bids);
         
     }
+    
+    public void addBid(Bid bid){
+        this.bids.add(bid);
+        this.setItems(this.bids);
+    }
+    
+    public void setBids(List<Bid> bids){
+        this.bids = bids;
+        this.setItems(this.bids);
+    }
 }

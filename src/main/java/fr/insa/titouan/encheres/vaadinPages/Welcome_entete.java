@@ -21,6 +21,8 @@ import java.util.logging.Logger;
 public class Welcome_entete extends HorizontalLayout {
 
     public Welcome_entete(VuePrincipale main) {
+        this.setDefaultVerticalComponentAlignment(Alignment.CENTER);
+        
         this.add(new H1("PN - Enchères"));
 
         Button connect = new Button("Connexion");
@@ -54,7 +56,11 @@ public class Welcome_entete extends HorizontalLayout {
         
         Button showObjects = new Button("Afficher les objets");
         showObjects.addClickListener((event)-> {
-            main.setPrincipal(new ShowArticles(main));
+            try {
+                main.setPrincipal(new ShowArticles(main));
+            } catch (SQLException ex) {
+                Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
+            }
         });
         
         Button createObject = new Button("Vendre un objet");

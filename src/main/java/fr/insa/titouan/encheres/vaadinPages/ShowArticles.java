@@ -23,15 +23,19 @@ public class ShowArticles extends VerticalLayout {
     
     ArticleList articles;
     
-    public ShowArticles(VuePrincipale main) {
+    public ShowArticles(VuePrincipale main) throws SQLException {
         this.add(new H3("Liste des articles"));
         
         Button validate = new Button ("Sélectionner");
         validate.addClickListener((event) -> {
             Set<Article> selected = articles.getSelectedItems();
             for (Article select : selected){
-                Notification.show("L'objet d'id " + select.getId() + " a été sélectionné.");
-                main.setPrincipal(new ArticlePage(select.getId(),main));
+                try {
+                    Notification.show("L'objet d'id " + select.getId() + " a été sélectionné.");
+                    main.setPrincipal(new ArticlePage(select.getId(),main));
+                } catch (SQLException ex) {
+                    Logger.getLogger(ShowArticles.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
         this.add(validate);

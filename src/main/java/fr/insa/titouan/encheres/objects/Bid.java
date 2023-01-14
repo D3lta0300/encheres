@@ -15,7 +15,15 @@ public class Bid {
     private Timestamp time;
     private String nom_complet;
     private String object;
+    private int id;
 
+    public Bid(int id, int value, Timestamp time, String nom_complet, String object) {
+        this.value = value;
+        this.time = time;
+        this.nom_complet = nom_complet;
+        this.object = object;
+    }
+    
     public Bid(int value, Timestamp time, String nom_complet, String object) {
         this.value = value;
         this.time = time;
@@ -23,6 +31,14 @@ public class Bid {
         this.object = object;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+    
     public String getObject() {
         return object;
     }
