@@ -38,19 +38,22 @@ public class ArticlePage extends HorizontalLayout {
             this.add(this.left, this.right);
             
             H1 title = new H1(article.getTitle());
+            VerticalLayout titleAndImage = new VerticalLayout(title,bdd.getArticleImage(id, main.getSession().getCon()));
             Html author = new Html("<P> Cet article est vendu par " + article.getAuthor() + "</p>");
             Html description = new Html("<p>" + article.getDescription() + "</p>");
             Details details = new Details("Description",description);
             
-            this.left.add(title,author, details);
+            this.left.add(titleAndImage,author, details);
             
             IntegerField bid = new IntegerField("Quel prix proposé vous ?");
             bid.setClearButtonVisible(true);
             Div euro = new Div();
             euro.setText("€");
-            bid.setWidth("50%");
+            bid.setSuffixComponent(euro);
+            bid.setWidth("90%");
             bid.setMin(this.article.getHighest_bid());
             Button valider = new Button("Soummetre");
+            valider.setWidth("50%");
             HorizontalLayout new_bid = new HorizontalLayout(bid, valider);
             new_bid.setDefaultVerticalComponentAlignment(Alignment.END);
             

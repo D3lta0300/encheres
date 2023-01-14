@@ -20,6 +20,7 @@ package fr.insa.titouan.encheres.vaadinPages;
 
 import fr.insa.titouan.encheres.objects.Session;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -66,6 +67,7 @@ public class VuePrincipale extends VerticalLayout {
         
         this.entete = new HorizontalLayout();
         this.entete.setWidthFull();
+        this.entete.setHeight("4em");
 
         this.principal = new VerticalLayout();
         this.principal.setWidthFull();

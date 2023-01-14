@@ -23,7 +23,9 @@ public class Welcome_entete extends HorizontalLayout {
     public Welcome_entete(VuePrincipale main) {
         this.setDefaultVerticalComponentAlignment(Alignment.CENTER);
         
-        this.add(new H1("PN - Enchères"));
+        H1 title = new H1("PN - Enchères");
+        title.setHeight("2em");
+        this.add(title);
 
         Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
