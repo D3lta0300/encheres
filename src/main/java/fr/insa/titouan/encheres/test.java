@@ -4,10 +4,13 @@
  */
 package fr.insa.titouan.encheres;
 
-import static fr.insa.titouan.encheres.bdd.createSchema;
 import static fr.insa.titouan.encheres.bdd.defaultConnect;
-import java.security.NoSuchAlgorithmException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,19 +21,20 @@ import java.util.logging.Logger;
  */
 public class test {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException, IOException {
 
         try (Connection con = defaultConnect()){
-            System.out.println("Link is sucessfully etablished");
-            bdd.deleteAllTables(con);
-            createSchema(con);
-            bdd.addExample(con);
-            bdd.textInterface();
+            PreparedStatement pst = con.prepareStatement("UPDATE articles SET image = ? WHERE id = ?");
+            pst.setInt(2, 1);
+            File file = new File("C:\\Users\\Titouan\\Downloads\\test.jpg");
+            FileInputStream fis = new FileInputStream(file);
+            pst.setBinaryStream(1, fis, (int)file.length());
+            pst.executeUpdate();
+            pst.close();
+            fis.close();
             
         } catch (ClassNotFoundException | SQLException ex) {
             Logger.getLogger(bdd.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NoSuchAlgorithmException ex) {
-            Logger.getLogger(test.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -4,9 +4,13 @@
  */
 package fr.insa.titouan.encheres;
 
-
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.server.InputStreamFactory;
+import com.vaadin.flow.server.StreamResource;
 import fr.insa.titouan.encheres.objects.Bid;
 import fr.insa.titouan.encheres.objects.Article;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -51,7 +55,7 @@ public class bdd {
         con.setAutoCommit(false);
         try ( Statement st = con.createStatement()) {
             // creation des tables
-                        st.executeUpdate("""
+            st.executeUpdate("""
                              CREATE TABLE categories(
                                 id INTEGER NOT NULL PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                 name VARCHAR(64) NOT NULL UNIQUE
@@ -80,7 +84,7 @@ public class bdd {
                                 category INTEGER,
                                 created_by INTEGER,
                                 highest_bid INTEGER,
-                                image VARCHAR(256),
+                                image BYTEA,
                                 CONSTRAINT fk_obj_user
                                     FOREIGN KEY(created_by) 
                                         REFERENCES users(id)
@@ -200,12 +204,12 @@ public class bdd {
                                             JOIN articles ON articles.id = on_article
                                             ORDER BY at ASC""");
             while (res.next()) {
-                out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("author"), res.getString("title")));
+                out.add(new Bid(res.getInt("value"), res.getTimestamp("at"), res.getString("author"), res.getString("title")));
             }
         }
         return out;
     }
-    
+
     public static List<Bid> showBidsOnObject(int id, Connection con) throws SQLException {
         List<Bid> out = new ArrayList<>();
         try ( PreparedStatement pst = con.prepareStatement("""
@@ -219,12 +223,12 @@ public class bdd {
             pst.setInt(1, id);
             ResultSet res = pst.executeQuery();
             while (res.next()) {
-                out.add(new Bid(res.getInt("value"),res.getTimestamp("at"), res.getString("author"), res.getString("title")));
+                out.add(new Bid(res.getInt("value"), res.getTimestamp("at"), res.getString("author"), res.getString("title")));
             }
         }
         return out;
     }
-    
+
     public static List<Article> showArticles(Connection con) throws SQLException {
         List<Article> out = new ArrayList<>();
         try ( Statement st = con.createStatement()) {
@@ -239,7 +243,7 @@ public class bdd {
         return out;
     }
 
-    public static Article getArticle(int id, Connection con) throws SQLException{
+    public static Article getArticle(int id, Connection con) throws SQLException {
         Article out = new Article();
         try ( Statement st = con.createStatement()) {
             ResultSet res = st.executeQuery("""
@@ -247,14 +251,14 @@ public class bdd {
                                             FROM articles
                                             JOIN users ON created_by = users.id
                                             WHERE articles.id = """ + id);
-            
+
             while (res.next()) {
-                out = new Article(res.getInt("id"), res.getString("title"), res.getString("author"), res.getInt("highest_bid"),res.getString("description"));
+                out = new Article(res.getInt("id"), res.getString("title"), res.getString("author"), res.getInt("highest_bid"), res.getString("description"));
             }
         }
         return out;
     }
-    
+
     public static int chooseUser(Connection con) throws SQLException {
         System.out.println("Qui êtes vous ? (entrer votre numéro)");
         showUsers(con);
@@ -313,6 +317,26 @@ public class bdd {
         }
     }
 
+    public static Image getArticleImage(int id, Connection con) throws SQLException {
+        try ( PreparedStatement pst = con.prepareStatement("SELECT image FROM articles WHERE id=?")) {
+            pst.setInt(1, id);
+            ResultSet rs = pst.executeQuery();
+            rs.next();
+            final byte[] image = rs.getBytes("image");
+            StreamResource streamResource = new StreamResource("isr", new InputStreamFactory() {
+                @Override
+                public InputStream createInputStream() {
+                    final InputStream is = new ByteArrayInputStream(image);
+                    return is;
+                }
+            });
+            return new Image(streamResource, "image");
+        } catch (SQLException ex) {
+            System.out.println(ex);
+            return null;
+        }
+    }
+
     public static void textArticle(Connection con) throws SQLException {
         Scanner scanner = new Scanner(System.in);
         int userID = chooseUser(con);
@@ -340,8 +364,7 @@ public class bdd {
                                               INSERT INTO bids (from_user, on_article, at, value)
                                               values (?,?,?,?)
                                               """, PreparedStatement.RETURN_GENERATED_KEYS);
-                
-                 
+
                 pst2.setInt(1, userID);
                 pst2.setInt(2, articleID);
                 pst2.setTimestamp(3, new Timestamp(System.currentTimeMillis()));
@@ -349,12 +372,12 @@ public class bdd {
                 pst2.executeUpdate();
                 ResultSet bidID = pst2.getGeneratedKeys();
                 bidID.next();
-                
+
                 PreparedStatement pst3 = con.prepareStatement("UPDATE articles SET highest_bid = ? WHERE id = ?");
                 pst3.setInt(1, value);
                 pst3.setInt(2, articleID);
                 pst3.executeUpdate();
-                
+
                 con.commit();
                 return bidID.getInt(1);
 
@@ -362,8 +385,7 @@ public class bdd {
                 con.rollback();
                 return -1; //pas propre comme méthode...
             }
-        }
-        finally {
+        } finally {
             con.setAutoCommit(true);
         }
 
@@ -489,43 +511,43 @@ public class bdd {
     public static String hashPw(String pw, String CP) throws NoSuchAlgorithmException {
         String password = pw/*+CP*/;
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        byte [] hash = md.digest(password.getBytes());
-        return new String(hash,Charset.forName("UTF-8"));
+        byte[] hash = md.digest(password.getBytes());
+        return new String(hash, Charset.forName("UTF-8"));
     }
-    
-    public static boolean userExists(String user) throws SQLException, ClassNotFoundException{
+
+    public static boolean userExists(String user) throws SQLException, ClassNotFoundException {
         Connection con = defaultConnect();
         Statement st = con.createStatement();
         ResultSet res = st.executeQuery("SELECT email FROM users");
-        boolean a=false;
-        while (!a&&res.next()){
-            a=user.equals(res.getString("email"));
+        boolean a = false;
+        while (!a && res.next()) {
+            a = user.equals(res.getString("email"));
         }
         return a;
     }
-    
-    public static boolean rightPw(String mail, String pw) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException{
+
+    public static boolean rightPw(String mail, String pw) throws SQLException, ClassNotFoundException, NoSuchAlgorithmException {
         Connection con = defaultConnect();
         Statement st = con.createStatement();
         ResultSet res = st.executeQuery("SELECT email,codepostal,pw FROM users");
-        boolean a=false;
-        while (!a&&res.next()){
-            if (mail.equals(res.getString("email"))){
-                
-                a=hashPw(pw, res.getString("codepostal")).equals(res.getString("pw"));
+        boolean a = false;
+        while (!a && res.next()) {
+            if (mail.equals(res.getString("email"))) {
+
+                a = hashPw(pw, res.getString("codepostal")).equals(res.getString("pw"));
             }
         }
         return a;
     }
-    
-    public static int getUserId(String mail) throws ClassNotFoundException, SQLException{
+
+    public static int getUserId(String mail) throws ClassNotFoundException, SQLException {
         Connection con = defaultConnect();
         Statement st = con.createStatement();
         ResultSet res = st.executeQuery("SELECT id,email FROM users");
-        int i=-1;
-        while (res.next()){
-            if (mail.equals(res.getString("email"))){
-                i=res.getInt("id");
+        int i = -1;
+        while (res.next()) {
+            if (mail.equals(res.getString("email"))) {
+                i = res.getInt("id");
             }
         }
         return i;
