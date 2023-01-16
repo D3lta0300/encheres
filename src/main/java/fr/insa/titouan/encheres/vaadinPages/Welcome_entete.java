@@ -6,8 +6,11 @@ package fr.insa.titouan.encheres.vaadinPages;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import fr.insa.titouan.encheres.bdd;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
@@ -56,7 +59,8 @@ public class Welcome_entete extends HorizontalLayout {
             main.setPrincipal(new ShowBids(main));
         });
         
-        Button showObjects = new Button("Afficher les objets");
+        
+        Icon showObjects = new Icon("lumo", "search");
         showObjects.addClickListener((event)-> {
             try {
                 main.setPrincipal(new ShowArticles(main));
@@ -65,11 +69,23 @@ public class Welcome_entete extends HorizontalLayout {
             }
         });
         
+        TextField searchField = new TextField();
+        searchField.setSuffixComponent(showObjects);
+        
         Button createObject = new Button("Vendre un objet");
         createObject.addClickListener((event) -> {
             main.setPrincipal(new CreateArticle(main));
         });
 
-        this.add(connect, createAccount, reset, showBids, showObjects, createObject);
+        VerticalLayout container = new VerticalLayout();
+        container.setDefaultHorizontalComponentAlignment(Alignment.END);
+        UserIcon uIcon = new UserIcon(main);
+        uIcon.setAlignItems(Alignment.CENTER);
+        uIcon.setWidth("5%");
+        container.add(uIcon);
+        container.setWidth("10%");
+        
+        this.add(reset, showBids, showObjects,searchField, createObject, container);
+        this.setWidth("100%");
     }
 }

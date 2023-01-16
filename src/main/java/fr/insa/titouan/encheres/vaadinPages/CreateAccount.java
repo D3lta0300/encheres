@@ -7,6 +7,7 @@ package fr.insa.titouan.encheres.vaadinPages;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -64,8 +65,12 @@ public class CreateAccount extends FormLayout {
                 Notification.show("Il y a une erreur dans votre mot de passe.");
             }
         });
-
-        this.add(this.prénom, this.nom, this.postalcode, this.email, this.pw, this.verify, this.send);
-
+        
+        H2 title = new H2("Créer un compte");
+        title.setWidth("100%");
+        
+        this.add(title,this.prénom, this.nom, this.postalcode, this.email, this.pw, this.verify, this.send);
+        
+        this.setColspan(title,2);
     }
 }

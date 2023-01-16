@@ -5,6 +5,7 @@
 package fr.insa.titouan.encheres.vaadinPages;
 
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
@@ -26,7 +27,9 @@ public class ConnectionPage extends VerticalLayout {
     
     public ConnectionPage(VuePrincipale main){
         this.email = new EmailField("Quel est votre adresse mail ?");
+        this.email.setWidth("80%");
         this.pw = new PasswordField("Veuillez choisir un mot de passe :");
+        this.pw.setWidth("80%");
         this.send = new Button("Valider");
         
         this.send.addClickListener((event) ->{
@@ -49,7 +52,10 @@ public class ConnectionPage extends VerticalLayout {
             
         });
         
-        this.add(this.email, this.pw, this.send);
+        H2 title = new H2("Connexion");
+        title.setWidth("100%");
+        
+        this.add(title,this.email, this.pw, this.send);
         
     }
 }
