@@ -9,6 +9,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -25,26 +26,31 @@ import java.util.logging.Logger;
 public class ArticlePage extends HorizontalLayout {
 
     private Article article;
-    private VerticalLayout left;
+    private HorizontalLayout left;
     private VerticalLayout right;
 
     public ArticlePage(int id, VuePrincipale main) {
         try {
             this.setSizeFull();
             this.article = bdd.getArticle(id, main.getSession().getCon());
-            this.left = new VerticalLayout();
+            this.left = new HorizontalLayout();
             this.right = new VerticalLayout();
-            this.right.setWidth("50%");
-            this.left.setWidth("50%");
+            this.right.setWidth("35%");
+            this.left.setWidth("65%");
             this.add(this.left, this.right);
 
             H1 title = new H1(article.getTitle());
-            VerticalLayout titleAndImage = new VerticalLayout(title, bdd.getArticleImage(id, main.getSession().getCon()));
             Html author = new Html("<P> Cet article est vendu par " + article.getAuthor() + "</p>");
             Html description = new Html("<p>" + article.getDescription() + "</p>");
             Details details = new Details("Description", description);
 
-            this.left.add(titleAndImage, author, details);
+            VerticalLayout container = new VerticalLayout(title, author, details);
+            
+            Image image = bdd.getArticleImage(id, main.getSession().getCon());
+            image.setMaxWidth("20em");
+            image.setMaxHeight("50em");
+            
+            this.left.add(container, image);
 
             IntegerField bid = new IntegerField("Quel prix proposé vous ?");
             bid.setClearButtonVisible(true);
@@ -58,7 +64,7 @@ public class ArticlePage extends HorizontalLayout {
             HorizontalLayout new_bid = new HorizontalLayout(bid, valider);
             new_bid.setDefaultVerticalComponentAlignment(Alignment.END);
 
-            BidList bidlist = new BidList(bdd.showBidsOnObject(id, main.getSession().getCon()));
+            BidList bidlist = new BidList(bdd.showBidsOnObject(id, main.getSession().getCon()),1);
             bidlist.setWidth("100%");
             this.right.add(new_bid, bidlist);
 

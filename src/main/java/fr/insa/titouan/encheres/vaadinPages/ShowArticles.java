@@ -20,30 +20,26 @@ import java.util.Set;
  * @author Titouan
  */
 public class ShowArticles extends VerticalLayout {
-    
+
     ArticleList articles;
-    
-    public ShowArticles(VuePrincipale main) throws SQLException {
+
+    public ShowArticles(VuePrincipale main) {
         this.add(new H3("Liste des articles"));
-        
-        Button validate = new Button ("Sélectionner");
+
+        Button validate = new Button("Sélectionner");
         validate.addClickListener((event) -> {
             Set<Article> selected = articles.getSelectedItems();
-            for (Article select : selected){
-                try {
-                    Notification.show("L'objet d'id " + select.getId() + " a été sélectionné.");
-                    main.setPrincipal(new ArticlePage(select.getId(),main));
-                } catch (SQLException ex) {
-                    Logger.getLogger(ShowArticles.class.getName()).log(Level.SEVERE, null, ex);
-                }
+            for (Article select : selected) {
+                Notification.show("L'objet d'id " + select.getId() + " a été sélectionné.");
+                main.setPrincipal(new ArticlePage(select.getId(), main));
             }
         });
         this.add(validate);
-        
+
         try {
             this.articles = new ArticleList(bdd.showArticles(main.getSession().getCon()));
             this.add(this.articles);
-        } catch (SQLException ex) { 
+        } catch (SQLException ex) {
             Logger.getLogger(ShowBids.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

@@ -11,14 +11,13 @@ package fr.insa.titouan.encheres.vaadinPages;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.EmailField;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
@@ -35,11 +34,11 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import org.imgscalr.Scalr;
 
 //Fortement inspiré de https://cookbook.vaadin.com/upload-image-to-file
 @Route("upload-image-to-file")
 public class CreateArticle extends VerticalLayout {
-
 
     private File file;
     private String originalFileName;
@@ -47,7 +46,7 @@ public class CreateArticle extends VerticalLayout {
     private TextField Titre;
     private TextArea Description;
     private DatePicker fin;
-    private TextField prix;
+    private IntegerField prix;
     private ComboBox categories;
     private Button send;
 
@@ -64,49 +63,55 @@ public class CreateArticle extends VerticalLayout {
         this.categories = new ComboBox("Categories");
         try {
             ArrayList<Categorie> a = bdd.getCategories(main.getSession().getCon());
-            String [] b = new String [a.size()] ;
-            for (int i=0;i<b.length;i++){
-                b[i]=a.get(i).toString();
+            String[] b = new String[a.size()];
+            for (int i = 0; i < b.length; i++) {
+                b[i] = a.get(i).toString();
             }
             this.categories.setItems((Object[]) b);
         } catch (SQLException ex) {
             Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
         }
-        this.prix = new TextField("Prix Initial");
-        add(upload, output, categories,Titre, Description,fin,prix,send);
+        this.prix = new IntegerField("Prix Initial");
+        Div euro = new Div();
+        euro.setText("€");
+        this.prix.setSuffixComponent(euro);
+        add(upload, output, categories, Titre, Description, fin, prix, send);
 
         // Configure upload component
         upload.setAcceptedFileTypes("image/jpeg", "image/png", "image/gif");
         upload.addSucceededListener(event -> {
             output.removeAll();
-            output.add(new Text("Uploaded: "+originalFileName+" to "+ file.getAbsolutePath()+ "Type: "+mimeType));
-            output.add(new Image(new StreamResource(this.originalFileName,this::loadFile),"Uploaded image"));
+            output.add(new Text("Uploaded: " + originalFileName + " to " + file.getAbsolutePath() + "Type: " + mimeType));
+            output.add(new Image(new StreamResource(this.originalFileName, this::loadFile), "Uploaded image"));
         });
         upload.addFailedListener(event -> {
             output.removeAll();
             output.add(new Text("Upload failed: " + event.getReason()));
         });
-        
+
         send.addClickListener((event) -> {
             LocalDateTime ldt = LocalDateTime.of(fin.getValue(), LocalTime.MIN);
             Timestamp ts = Timestamp.valueOf(ldt);
             String s = (String) categories.getValue();
             String in = "";
-            int i=0;
-            while(s.charAt(i)>=48&&s.charAt(i)<=57&&i<s.length()){
-                in = in+s.charAt(i);
+            int i = 0;
+            while (s.charAt(i) >= 48 && s.charAt(i) <= 57 && i < s.length()) {
+                in = in + s.charAt(i);
                 System.out.println(i);
                 i++;
             }
             try {
-                BufferedImage bImage = ImageIO.read(file);
+                //BufferedImage bImage = ImageIO.read(file);
+                BufferedImage bImage = Scalr.resize(ImageIO.read(file), 300);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ImageIO.write(bImage, "jpg", bos );
-                byte [] data = bos.toByteArray();
-                bdd.addArticle(main.getSession().getCon(), Titre.getValue(), Description.getValue(),ts, Integer.parseInt(prix.getValue()), main.getSession().getUser(), Integer.parseInt(in),data);
+                ImageIO.write(bImage, "jpg", bos);
+                byte[] data = bos.toByteArray();
+                bdd.addArticle(main.getSession().getCon(), Titre.getValue(), Description.getValue(), ts, prix.getValue(), main.getSession().getUser(), Integer.parseInt(in), data);
             } catch (IOException ex) {
                 Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
+                Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
                 Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
             }
             Titre.clear();
@@ -117,11 +122,11 @@ public class CreateArticle extends VerticalLayout {
             categories.clear();
             upload.clearFileList();
         });
-        
 
     }
 
-    /** Load a file from local filesystem.
+    /**
+     * Load a file from local filesystem.
      *
      */
     public InputStream loadFile() {
@@ -133,7 +138,8 @@ public class CreateArticle extends VerticalLayout {
         return null;
     }
 
-    /** Receive a uploaded file to a file.
+    /**
+     * Receive a uploaded file to a file.
      */
     public OutputStream receiveUpload(String originalFileName, String MIMEType) {
         this.originalFileName = originalFileName;
@@ -151,4 +157,6 @@ public class CreateArticle extends VerticalLayout {
 
         return null;
     }
+
+
 }

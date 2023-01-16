@@ -16,6 +16,10 @@ public class BidList extends Grid<Bid> {
 
     private List<Bid> bids;
     
+    /***
+     * bid list
+     * @param bids 
+     */
     public BidList(List<Bid> bids){
         this.bids = bids;
         
@@ -26,6 +30,21 @@ public class BidList extends Grid<Bid> {
         
         this.setItems(this.bids);
         
+    }
+    
+    /**
+     * Bid list on an article
+     * @param bids
+     * @param i 
+     */
+    public BidList(List<Bid> bids, int i){
+        this.bids = bids;
+        
+        Column<Bid> nom_complet = this.addColumn(Bid::getNom_complet).setHeader("Enchère de");
+        Column<Bid> values = this.addColumn(Bid::getValue).setHeader("Pour une valeur de (€)    ");
+        Column<Bid> time = this.addColumn(Bid::getTime).setHeader("Réalisée à");
+        
+        this.setItems(this.bids);
     }
     
     public void addBid(Bid bid){

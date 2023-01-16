@@ -61,11 +61,7 @@ public class Welcome_entete extends HorizontalLayout {
 
         Icon showObjects = new Icon("lumo", "search");
         showObjects.addClickListener((event) -> {
-            try {
-                main.setPrincipal(new ShowArticles(main));
-            } catch (SQLException ex) {
-                Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                    main.setPrincipal(new ShowArticles(main));
         });
 
         TextField searchField = new TextField();
