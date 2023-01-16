@@ -15,4 +15,8 @@ public class LogPage extends HorizontalLayout{
     public LogPage(VuePrincipale main, Component c){
         this.add(new ConnectionPage(main, c), new CreateAccount(main, c));
     }
+    
+    public LogPage(VuePrincipale main, Component c, int articleID, int value){
+        this.add(new ConnectionPage(main, c, articleID, value), new CreateAccount(main, c, articleID, value));
+    }
 }
