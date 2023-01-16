@@ -16,4 +16,7 @@ public class Categorie {
         this.id=id;
         this.Name=name;
     }
+    public String toString(){
+        return ""+this.id+"."+this.Name;
+    }
 }

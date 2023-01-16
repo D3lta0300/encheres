@@ -277,21 +277,25 @@ public class bdd {
         }
     }
     
-    public static ArrayList<String> getCategories(Connection con) throws SQLException {
+    public static ArrayList<Categorie> getCategories(Connection con) throws SQLException {
         Statement st = con.createStatement();
         ResultSet res = st.executeQuery("SELECT id,name FROM categories");
-        ArrayList<String> a = new ArrayList<>();
+        ArrayList<Categorie> a = new ArrayList<>();
         while (res.next()) {
-            a.add(res.getString("name"));
+            a.add(new Categorie(res.getInt("id"), res.getString("name")));
         }
         return a;
     }
     
     public static int getCategoryFromName(Connection con, String Name) throws SQLException{
-        PreparedStatement pst = con.prepareStatement("select id from coategories where name=' ? '");
-        pst.setString(1, Name);
-        ResultSet res = pst.executeQuery("");
-        return res.getInt("id");
+        System.out.println(Name);
+        Statement st = con.createStatement();
+        ResultSet res = st.executeQuery("select id from categories where name=' "+Name+"'");
+        int id=-1;
+        while (res.next()){
+            return res.getInt("id");
+        }
+        return id;
     }
 
     public static int chooseCategorie(Connection con) throws SQLException {

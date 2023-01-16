@@ -25,6 +25,7 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import fr.insa.titouan.encheres.bdd;
+import fr.insa.titouan.encheres.objects.Categorie;
 import java.awt.image.BufferedImage;
 
 import java.io.*;
@@ -62,10 +63,10 @@ public class CreateArticle extends VerticalLayout {
         this.fin = new DatePicker("Date de Fin");
         this.categories = new ComboBox("Categories");
         try {
-            ArrayList<String> a = bdd.getCategories(main.getSession().getCon());
+            ArrayList<Categorie> a = bdd.getCategories(main.getSession().getCon());
             String [] b = new String [a.size()] ;
             for (int i=0;i<b.length;i++){
-                b[i]=a.get(i);
+                b[i]=a.get(i).toString();
             }
             this.categories.setItems((Object[]) b);
         } catch (SQLException ex) {
@@ -89,12 +90,20 @@ public class CreateArticle extends VerticalLayout {
         send.addClickListener((event) -> {
             LocalDateTime ldt = LocalDateTime.of(fin.getValue(), LocalTime.MIN);
             Timestamp ts = Timestamp.valueOf(ldt);
+            String s = (String) categories.getValue();
+            String in = "";
+            int i=0;
+            while(s.charAt(i)>=48&&s.charAt(i)<=57&&i<s.length()){
+                in = in+s.charAt(i);
+                System.out.println(i);
+                i++;
+            }
             try {
                 BufferedImage bImage = ImageIO.read(file);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ImageIO.write(bImage, "jpg", bos );
                 byte [] data = bos.toByteArray();
-                bdd.addArticle(main.getSession().getCon(), Titre.getValue(), Description.getValue(),ts, Integer.parseInt(prix.getValue()), main.getSession().getUser(), bdd.getCategoryFromName(main.getSession().getCon(), (String) this.categories.getValue()),data);
+                bdd.addArticle(main.getSession().getCon(), Titre.getValue(), Description.getValue(),ts, Integer.parseInt(prix.getValue()), main.getSession().getUser(), Integer.parseInt(in),data);
             } catch (IOException ex) {
                 Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
             } catch (SQLException ex) {
