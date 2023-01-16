@@ -4,11 +4,13 @@
  */
 package fr.insa.titouan.encheres;
 
+import com.helger.commons.locale.country.ECountry;
 import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.server.InputStreamFactory;
 import com.vaadin.flow.server.StreamResource;
 import fr.insa.titouan.encheres.objects.Bid;
 import fr.insa.titouan.encheres.objects.Article;
+import fr.insa.titouan.encheres.objects.Categorie;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -274,6 +276,23 @@ public class bdd {
             }
         }
     }
+    
+    public static ArrayList<String> getCategories(Connection con) throws SQLException {
+        Statement st = con.createStatement();
+        ResultSet res = st.executeQuery("SELECT id,name FROM categories");
+        ArrayList<String> a = new ArrayList<>();
+        while (res.next()) {
+            a.add(res.getString("name"));
+        }
+        return a;
+    }
+    
+    public static int getCategoryFromName(Connection con, String Name) throws SQLException{
+        PreparedStatement pst = con.prepareStatement("select id from coategories where name='?");
+        pst.setString(0, Name);
+        ResultSet res = pst.executeQuery("");
+        return res.getInt("id");
+    }
 
     public static int chooseCategorie(Connection con) throws SQLException {
         System.out.println("Quel catégorie souhaitez vous ? (entrer son numéro)");
@@ -292,12 +311,12 @@ public class bdd {
         }
     }
 
-    public static int addArticle(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID) throws SQLException {
+    public static int addArticle(Connection con, String title, String description, Timestamp end, int initial_price, int userID, int categoryID, byte [] data) throws SQLException {
         con.setAutoCommit(false);
         try ( PreparedStatement pst = con.prepareStatement(
                 """
-                INSERT INTO articles (title,description,start_bids,end_bids,initial_price,category,created_by,highest_bid)
-                VALUES (?,?,?,?,?,?,?,?)
+                INSERT INTO articles (title,description,start_bids,end_bids,initial_price,category,created_by,highest_bid,image)
+                VALUES (?,?,?,?,?,?,?,?,?)
                 """, PreparedStatement.RETURN_GENERATED_KEYS)) {
             pst.setString(1, title);
             pst.setString(2, description);
@@ -307,6 +326,7 @@ public class bdd {
             pst.setInt(6, categoryID);
             pst.setInt(7, userID);
             pst.setInt(8, initial_price);
+            pst.setBytes(9, data);
             pst.executeUpdate();
             System.out.println("System : user added");
             ResultSet oID = pst.getGeneratedKeys();
@@ -350,7 +370,7 @@ public class bdd {
         System.out.println("Quand doit se terminer l'enchère ? (entrer sous la forme 'année-mois-jour heure:minute:seconde'");
         scanner.nextLine();
         Timestamp end = Timestamp.valueOf(scanner.nextLine());
-        addArticle(con, title, description, end, initial_price, userID, categoryID);
+        addArticle(con, title, description, end, initial_price, userID, categoryID, new byte[1]);
     }
 
     public static int addBid(Connection con, int userID, int articleID, int value) throws SQLException {
@@ -436,9 +456,9 @@ public class bdd {
             users[0] = addUser(con, new String[]{"Pelissier", "Jean", "mail.com", "motdp", "68007"});
             users[1] = addUser(con, new String[]{"Plage", "Toto", "parsols@mer.com", "helloWorld", "TK8639"});
             users[2] = addUser(con, new String[]{"Chèvre", "Gandolfi", "roi.des.vosges@caf.com", "helloWorld", "TK8639"});
-            articles[0] = addArticle(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1]);
-            articles[1] = addArticle(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0]);
-            articles[2] = addArticle(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0]);
+            articles[0] = addArticle(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1], new byte[1]);
+            articles[1] = addArticle(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0], new byte[1]);
+            articles[2] = addArticle(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0], new byte[1]);
             bids[0] = addBid(con, users[0], articles[0], 219);
             bids[1] = addBid(con, users[0], articles[1], 40);
             bids[2] = addBid(con, users[1], articles[0], 234);

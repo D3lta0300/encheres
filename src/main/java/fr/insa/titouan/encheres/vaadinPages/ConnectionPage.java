@@ -49,7 +49,6 @@ public class ConnectionPage extends VerticalLayout {
             } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException ex) {
                 Logger.getLogger(ConnectionPage.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
         });
         
         H2 title = new H2("Connexion");

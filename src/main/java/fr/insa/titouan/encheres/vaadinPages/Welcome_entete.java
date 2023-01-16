@@ -74,7 +74,13 @@ public class Welcome_entete extends HorizontalLayout {
         
         Button createObject = new Button("Vendre un objet");
         createObject.addClickListener((event) -> {
-            main.setPrincipal(new CreateArticle(main));
+            if(main.getSession().getUser()!=-1){
+                main.setPrincipal(new CreateArticle(main));
+            }
+            else{
+                Notification.show("Veuillez vous connecter");
+                main.setPrincipal(new ConnectionPage(main));
+            }
         });
 
         VerticalLayout container = new VerticalLayout();
