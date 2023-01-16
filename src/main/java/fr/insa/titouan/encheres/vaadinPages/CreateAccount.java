@@ -4,6 +4,7 @@
  */
 package fr.insa.titouan.encheres.vaadinPages;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -32,7 +33,7 @@ public class CreateAccount extends FormLayout {
     private PasswordField verify;
     private Button send;
 
-    public CreateAccount(VuePrincipale main) {
+    public CreateAccount(VuePrincipale main, Component c) {
         this.prénom = new TextField("Quel est votre prénom ?");
         this.nom = new TextField("Quel est votre nom ?");
         this.nom.setRequired(true);
@@ -61,6 +62,7 @@ public class CreateAccount extends FormLayout {
                 } catch (NoSuchAlgorithmException ex) {
                     Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                main.setPrincipal(c);
             } else {
                 Notification.show("Il y a une erreur dans votre mot de passe.");
             }

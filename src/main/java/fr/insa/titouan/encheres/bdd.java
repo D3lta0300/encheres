@@ -288,7 +288,7 @@ public class bdd {
     }
     
     public static int getCategoryFromName(Connection con, String Name) throws SQLException{
-        PreparedStatement pst = con.prepareStatement("select id from coategories where name='?");
+        PreparedStatement pst = con.prepareStatement("select id from coategories where name='?'");
         pst.setString(0, Name);
         ResultSet res = pst.executeQuery("");
         return res.getInt("id");

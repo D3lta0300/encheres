@@ -4,6 +4,7 @@
  */
 package fr.insa.titouan.encheres.vaadinPages;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 
 /**
@@ -11,7 +12,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
  * @author Titouan
  */
 public class LogPage extends HorizontalLayout{
-    public LogPage(VuePrincipale main){
-        this.add(new ConnectionPage(main), new CreateAccount(main));
+    public LogPage(VuePrincipale main, Component c){
+        this.add(new ConnectionPage(main, c), new CreateAccount(main, c));
     }
 }

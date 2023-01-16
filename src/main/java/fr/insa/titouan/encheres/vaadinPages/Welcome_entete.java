@@ -32,14 +32,14 @@ public class Welcome_entete extends HorizontalLayout {
 
         Button connect = new Button("Connexion");
         connect.addClickListener((event) -> {
-            main.setPrincipal(new ConnectionPage(main));
+            main.setPrincipal(new ConnectionPage(main, main.getPrincipal()));
             Notification.show("Vous allez être connecté");
         });
 
         Button createAccount = new Button("Nouvel utilisateur ?");
         createAccount.addClickListener((event) -> {
             Notification.show("Vous allez être redirigé vers le formulaire d'inscription.");
-            main.setPrincipal(new CreateAccount(main));
+            main.setPrincipal(new CreateAccount(main, main.getPrincipal()));
         });
 
         Button reset = new Button("Réinitialiser la BdD");
@@ -79,7 +79,7 @@ public class Welcome_entete extends HorizontalLayout {
             }
             else{
                 Notification.show("Veuillez vous connecter");
-                main.setPrincipal(new ConnectionPage(main));
+                main.setPrincipal(new LogPage(main,new CreateArticle(main)));
             }
         });
 

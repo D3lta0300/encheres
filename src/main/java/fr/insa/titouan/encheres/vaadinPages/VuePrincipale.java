@@ -49,6 +49,10 @@ public class VuePrincipale extends VerticalLayout {
         this.entete.removeAll();
         this.entete.add(c);
     }
+    
+    public VerticalLayout getPrincipal(){
+        return this.principal;
+    }
 
     public void setPrincipal(Component c) {
         this.principal.removeAll();

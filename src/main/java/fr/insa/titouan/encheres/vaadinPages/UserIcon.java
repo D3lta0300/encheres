@@ -30,7 +30,7 @@ public class UserIcon extends VerticalLayout {
 
         this.addClickListener((event) -> {
             if (this.state == -1) {
-                main.setPrincipal(new LogPage(main));
+                main.setPrincipal(new LogPage(main, main.getPrincipal()));
             } else {
                 Notification.show("Not done yet.");
             }

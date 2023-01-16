@@ -4,6 +4,7 @@
  */
 package fr.insa.titouan.encheres.vaadinPages;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
@@ -25,7 +26,7 @@ public class ConnectionPage extends VerticalLayout {
     private PasswordField pw;
     private Button send;
     
-    public ConnectionPage(VuePrincipale main){
+    public ConnectionPage(VuePrincipale main, Component c){
         this.email = new EmailField("Quel est votre adresse mail ?");
         this.email.setWidth("80%");
         this.pw = new PasswordField("Veuillez choisir un mot de passe :");
@@ -38,7 +39,9 @@ public class ConnectionPage extends VerticalLayout {
                     if (bdd.rightPw(email.getValue(), pw.getValue())){
                         main.setUser(bdd.getUserId(email.getValue()));
                         Notification.show("Connecté");
+                        main.setPrincipal(c);
                     }
+                    
                     else{
                         Notification.show("Mauvais mdp");
                     }
