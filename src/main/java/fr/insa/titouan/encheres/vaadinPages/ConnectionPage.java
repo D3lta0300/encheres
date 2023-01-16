@@ -22,42 +22,81 @@ import java.util.logging.Logger;
  * @author Titouan
  */
 public class ConnectionPage extends VerticalLayout {
+
     private EmailField email;
     private PasswordField pw;
     private Button send;
-    
-    public ConnectionPage(VuePrincipale main, Component c){
+
+    public ConnectionPage(VuePrincipale main, Component c) {
         this.email = new EmailField("Quel est votre adresse mail ?");
         this.email.setWidth("80%");
         this.pw = new PasswordField("Veuillez choisir un mot de passe :");
         this.pw.setWidth("80%");
         this.send = new Button("Valider");
-        
-        this.send.addClickListener((event) ->{
+
+        this.send.addClickListener((event) -> {
             try {
-                if (bdd.userExists(email.getValue())){
-                    if (bdd.rightPw(email.getValue(), pw.getValue())){
+                if (bdd.userExists(email.getValue())) {
+                    if (bdd.rightPw(email.getValue(), pw.getValue())) {
                         main.setUser(bdd.getUserId(email.getValue()));
                         Notification.show("Connecté");
                         main.setPrincipal(c);
-                    }
-                    
-                    else{
+                    } else {
                         Notification.show("Mauvais mdp");
                     }
-                }
-                else{
+                } else {
                     Notification.show("Email non reconnu");
                 }
             } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException ex) {
                 Logger.getLogger(ConnectionPage.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+
         H2 title = new H2("Connexion");
         title.setWidth("100%");
-        
-        this.add(title,this.email, this.pw, this.send);
-        
+
+        this.add(title, this.email, this.pw, this.send);
+
+    }
+
+    
+    /***
+     * let create a bid and then connect
+     * @param main
+     * @param c
+     * @param articleID
+     * @param value 
+     */
+    public ConnectionPage(VuePrincipale main, Component c, int articleID, int value) {
+        this.email = new EmailField("Quel est votre adresse mail ?");
+        this.email.setWidth("80%");
+        this.pw = new PasswordField("Veuillez choisir un mot de passe :");
+        this.pw.setWidth("80%");
+        this.send = new Button("Valider");
+
+        this.send.addClickListener((event) -> {
+            try {
+                if (bdd.userExists(email.getValue())) {
+                    if (bdd.rightPw(email.getValue(), pw.getValue())) {
+                        main.setUser(bdd.getUserId(email.getValue()));
+                        Notification.show("Connecté");
+                        main.setPrincipal(c);
+                        bdd.addBid(main.getSession().getCon(), main.getSession().getUser(), articleID, value);
+                    } else {
+                        Notification.show("Mauvais mdp");
+                    }
+                } else {
+                    Notification.show("Email non reconnu");
+                }
+            } catch (SQLException | ClassNotFoundException | NoSuchAlgorithmException ex) {
+                Logger.getLogger(ConnectionPage.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
+
+        H2 title = new H2("Connexion");
+        title.setWidth("100%");
+
+        this.add(title, this.email, this.pw, this.send);
+
     }
 }

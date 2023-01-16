@@ -23,28 +23,29 @@ import java.util.logging.Logger;
  * @author Titouan
  */
 public class ArticlePage extends HorizontalLayout {
+
     private Article article;
     private VerticalLayout left;
     private VerticalLayout right;
-    
-    public ArticlePage(int id, VuePrincipale main) throws SQLException{
+
+    public ArticlePage(int id, VuePrincipale main) {
         try {
             this.setSizeFull();
             this.article = bdd.getArticle(id, main.getSession().getCon());
             this.left = new VerticalLayout();
             this.right = new VerticalLayout();
             this.right.setWidth("50%");
-            this.left.setWidth("50%");          
+            this.left.setWidth("50%");
             this.add(this.left, this.right);
-            
+
             H1 title = new H1(article.getTitle());
-            VerticalLayout titleAndImage = new VerticalLayout(title,bdd.getArticleImage(id, main.getSession().getCon()));
+            VerticalLayout titleAndImage = new VerticalLayout(title, bdd.getArticleImage(id, main.getSession().getCon()));
             Html author = new Html("<P> Cet article est vendu par " + article.getAuthor() + "</p>");
             Html description = new Html("<p>" + article.getDescription() + "</p>");
-            Details details = new Details("Description",description);
-            
-            this.left.add(titleAndImage,author, details);
-            
+            Details details = new Details("Description", description);
+
+            this.left.add(titleAndImage, author, details);
+
             IntegerField bid = new IntegerField("Quel prix proposé vous ?");
             bid.setClearButtonVisible(true);
             Div euro = new Div();
@@ -56,16 +57,21 @@ public class ArticlePage extends HorizontalLayout {
             valider.setWidth("50%");
             HorizontalLayout new_bid = new HorizontalLayout(bid, valider);
             new_bid.setDefaultVerticalComponentAlignment(Alignment.END);
-            
+
             BidList bidlist = new BidList(bdd.showBidsOnObject(id, main.getSession().getCon()));
             bidlist.setWidth("100%");
-            this.right.add(new_bid,bidlist);
-            
+            this.right.add(new_bid, bidlist);
+
             valider.addClickListener((event) -> {
-                try {bdd.addBid(main.getSession().getCon(), main.getSession().getUser(), id, bid.getValue());
-                    bidlist.setBids(bdd.showBidsOnObject(id, main.getSession().getCon()));
-                } catch (SQLException ex) {
-                    Logger.getLogger(ArticlePage.class.getName()).log(Level.SEVERE, null, ex);
+                if (main.getSession().getUser() == -1) {
+                    main.setPrincipal(new LogPage(main, new ArticlePage(id, main), id, bid.getValue()));
+                } else {
+                    try {
+                        bdd.addBid(main.getSession().getCon(), main.getSession().getUser(), id, bid.getValue());
+                        bidlist.setBids(bdd.showBidsOnObject(id, main.getSession().getCon()));
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ArticlePage.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             });
         } catch (SQLException ex) {
