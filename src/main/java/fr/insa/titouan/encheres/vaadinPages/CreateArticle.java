@@ -67,7 +67,7 @@ public class CreateArticle extends VerticalLayout {
             for (int i=0;i<b.length;i++){
                 b[i]=a.get(i);
             }
-            this.categories.setItems(b);
+            this.categories.setItems((Object[]) b);
         } catch (SQLException ex) {
             Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -85,6 +85,7 @@ public class CreateArticle extends VerticalLayout {
             output.removeAll();
             output.add(new Text("Upload failed: " + event.getReason()));
         });
+        
         send.addClickListener((event) -> {
             LocalDateTime ldt = LocalDateTime.of(fin.getValue(), LocalTime.MIN);
             Timestamp ts = Timestamp.valueOf(ldt);

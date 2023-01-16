@@ -328,7 +328,7 @@ public class bdd {
             pst.setInt(8, initial_price);
             pst.setBytes(9, data);
             pst.executeUpdate();
-            System.out.println("System : user added");
+            System.out.println("System : article added");
             ResultSet oID = pst.getGeneratedKeys();
             oID.next();
             return oID.getInt(1);

@@ -25,7 +25,7 @@ public class Welcome_entete extends HorizontalLayout {
 
     public Welcome_entete(VuePrincipale main) {
         this.setDefaultVerticalComponentAlignment(Alignment.CENTER);
-        
+
         H1 title = new H1("PN - Enchères");
         title.setHeight("2em");
         this.add(title);
@@ -53,35 +53,34 @@ public class Welcome_entete extends HorizontalLayout {
                 Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+
         Button showBids = new Button("Afficher les enchères");
         showBids.addClickListener((event) -> {
             main.setPrincipal(new ShowBids(main));
         });
-        
-        
+
         Icon showObjects = new Icon("lumo", "search");
-        showObjects.addClickListener((event)-> {
+        showObjects.addClickListener((event) -> {
             try {
                 main.setPrincipal(new ShowArticles(main));
             } catch (SQLException ex) {
                 Logger.getLogger(Welcome_entete.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
-        
+
         TextField searchField = new TextField();
         searchField.setSuffixComponent(showObjects);
-        
+
         Button createObject = new Button("Vendre un objet");
         createObject.addClickListener((event) -> {
-            if(main.getSession().getUser()!=-1){
+            if (main.getSession().getUser() != -1) {
                 main.setPrincipal(new CreateArticle(main));
-            }
-            else{
+            } else {
                 Notification.show("Veuillez vous connecter");
-                main.setPrincipal(new LogPage(main,new CreateArticle(main)));
+                main.setPrincipal(new LogPage(main, new CreateArticle(main)));
             }
         });
+
 
         VerticalLayout container = new VerticalLayout();
         container.setDefaultHorizontalComponentAlignment(Alignment.END);
@@ -90,8 +89,8 @@ public class Welcome_entete extends HorizontalLayout {
         uIcon.setWidth("5%");
         container.add(uIcon);
         container.setWidth("10%");
-        
-        this.add(reset, showBids, showObjects,searchField, createObject, container);
+
+        this.add(reset, showBids, searchField, createObject, container);
         this.setWidth("100%");
     }
 }

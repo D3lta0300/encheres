@@ -55,24 +55,24 @@ public class CreateAccount extends FormLayout {
                 user[3] = this.pw.getValue();
                 user[4] = this.postalcode.getValue();
                 try {
-                    bdd.addUser(main.getSession().getCon(), user);
+                    main.getSession().setUser(bdd.addUser(main.getSession().getCon(), user));
+                    main.setPrincipal(c);
                 } catch (SQLException ex) {
                     Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                     Notification.show("il y a une erreur de BdD");
                 } catch (NoSuchAlgorithmException ex) {
                     Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                main.setPrincipal(c);
             } else {
                 Notification.show("Il y a une erreur dans votre mot de passe.");
             }
         });
-        
+
         H2 title = new H2("Créer un compte");
         title.setWidth("100%");
-        
-        this.add(title,this.prénom, this.nom, this.postalcode, this.email, this.pw, this.verify, this.send);
-        
-        this.setColspan(title,2);
+
+        this.add(title, this.prénom, this.nom, this.postalcode, this.email, this.pw, this.verify, this.send);
+
+        this.setColspan(title, 2);
     }
 }
