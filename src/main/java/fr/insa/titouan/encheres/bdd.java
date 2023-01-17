@@ -247,6 +247,23 @@ public class bdd {
         }
         return out;
     }
+    
+    public static List<Article> getArticlesFromCategory(Connection con, int I) throws SQLException{
+        List<Article> out = new ArrayList<>();
+        try ( PreparedStatement st = con.prepareStatement("""
+                                            SELECT title, articles.id, (prenom || ' ' || nom) AS author, highest_bid
+                                            FROM articles
+                                            JOIN users ON created_by = users.id
+                                            WHERE category = ?
+                                            ORDER BY highest_bid DESC""")) {
+            st.setInt(1, I);
+            ResultSet res = st.executeQuery();
+            while (res.next()) {
+                out.add(new Article(res.getInt("id"), res.getString("title"), res.getString("author"), res.getInt("highest_bid")));
+            }
+        }
+        return out;
+    }
 
     public static Article getArticle(int id, Connection con) throws SQLException {
         Article out = new Article();

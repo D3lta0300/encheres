@@ -58,5 +58,23 @@ public class ShowArticles extends VerticalLayout {
         } catch (SQLException ex) {
             Logger.getLogger(ShowBids.class.getName()).log(Level.SEVERE, null, ex);
         }
+        categories.addValueChangeListener((event) -> {
+            System.out.println("Changé");
+            String s = (String) categories.getValue();
+            String in = "";
+            int i = 0;
+            while (s.charAt(i) >= 48 && s.charAt(i) <= 57 && i < s.length()) {
+                in = in + s.charAt(i);
+                System.out.println(i);
+                i++;
+            }
+            try {
+                this.articles = new ArticleList(bdd.getArticlesFromCategory(main.getSession().getCon(), Integer.parseInt(in)));
+            } catch (SQLException ex) {
+                Logger.getLogger(ShowArticles.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            this.removeAll();
+            this.add(container,this.articles);
+        });
     }
 }
