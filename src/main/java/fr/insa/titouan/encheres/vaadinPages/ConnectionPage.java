@@ -41,6 +41,7 @@ public class ConnectionPage extends VerticalLayout {
                         main.setUser(bdd.getUserId(email.getValue()));
                         Notification.show("Connecté");
                         main.setPrincipal(c);
+                        main.setEntete(new Welcome_entete(main));
                     } else {
                         Notification.show("Mauvais mdp");
                     }
@@ -59,13 +60,14 @@ public class ConnectionPage extends VerticalLayout {
 
     }
 
-    
-    /***
+    /**
+     * *
      * let create a bid and then connect
+     *
      * @param main
      * @param c
      * @param articleID
-     * @param value 
+     * @param value
      */
     public ConnectionPage(VuePrincipale main, Component c, int articleID, int value) {
         this.email = new EmailField("Quel est votre adresse mail ?");
@@ -80,8 +82,9 @@ public class ConnectionPage extends VerticalLayout {
                     if (bdd.rightPw(email.getValue(), pw.getValue())) {
                         main.setUser(bdd.getUserId(email.getValue()));
                         Notification.show("Connecté");
-                        main.setPrincipal(c);
                         bdd.addBid(main.getSession().getCon(), main.getSession().getUser(), articleID, value);
+                        main.setEntete(new Welcome_entete(main));
+                        main.setPrincipal(c);
                     } else {
                         Notification.show("Mauvais mdp");
                     }
