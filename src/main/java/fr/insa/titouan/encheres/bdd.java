@@ -204,7 +204,7 @@ public class bdd {
                                             FROM bids
                                             JOIN users ON from_user = users.id
                                             JOIN articles ON articles.id = on_article
-                                            ORDER BY at ASC""");
+                                            ORDER BY at DESC""");
             while (res.next()) {
                 out.add(new Bid(res.getInt("value"), res.getTimestamp("at"), res.getString("author"), res.getString("title")));
             }
