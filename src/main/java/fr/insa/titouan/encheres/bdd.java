@@ -231,13 +231,15 @@ public class bdd {
         return out;
     }
 
-    public static List<Article> showArticles(Connection con) throws SQLException {
+    public static List<Article> showArticles(Connection con, String search) throws SQLException {
         List<Article> out = new ArrayList<>();
-        try ( Statement st = con.createStatement()) {
-            ResultSet res = st.executeQuery("""
+        try ( PreparedStatement st = con.prepareStatement("""
                                             SELECT title, articles.id, (prenom || ' ' || nom) AS author, highest_bid
                                             FROM articles
-                                            JOIN users ON created_by = users.id""");
+                                            JOIN users ON created_by = users.id
+                                            WHERE title LIKE '%' || ? || '%'""")) {
+            st.setString(1, search);
+            ResultSet res = st.executeQuery();
             while (res.next()) {
                 out.add(new Article(res.getInt("id"), res.getString("title"), res.getString("author"), res.getInt("highest_bid")));
             }

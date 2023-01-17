@@ -23,7 +23,7 @@ public class ShowArticles extends VerticalLayout {
 
     ArticleList articles;
 
-    public ShowArticles(VuePrincipale main) {
+    public ShowArticles(VuePrincipale main, String search) {
         this.add(new H3("Liste des articles"));
 
         Button validate = new Button("Sélectionner");
@@ -37,7 +37,7 @@ public class ShowArticles extends VerticalLayout {
         this.add(validate);
 
         try {
-            this.articles = new ArticleList(bdd.showArticles(main.getSession().getCon()));
+            this.articles = new ArticleList(bdd.showArticles(main.getSession().getCon(), search));
             this.add(this.articles);
         } catch (SQLException ex) {
             Logger.getLogger(ShowBids.class.getName()).log(Level.SEVERE, null, ex);

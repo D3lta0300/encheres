@@ -58,13 +58,13 @@ public class Welcome_entete extends HorizontalLayout {
         showBids.addClickListener((event) -> {
             main.setPrincipal(new ShowBids(main));
         });
-
+        
+        TextField searchField = new TextField();
         Icon showObjects = new Icon("lumo", "search");
         showObjects.addClickListener((event) -> {
-                    main.setPrincipal(new ShowArticles(main));
+                    main.setPrincipal(new ShowArticles(main, searchField.getValue()));
+                    System.out.println("Voici la chaine de caractère retenue : '" + searchField.getValue() + "'");
         });
-
-        TextField searchField = new TextField();
         searchField.setSuffixComponent(showObjects);
 
         Button createObject = new Button("Vendre un objet");
