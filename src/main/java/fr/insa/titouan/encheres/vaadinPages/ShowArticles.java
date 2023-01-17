@@ -4,6 +4,7 @@
  */
 package fr.insa.titouan.encheres.vaadinPages;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.H3;
@@ -37,7 +38,7 @@ public class ShowArticles extends VerticalLayout {
                 main.setPrincipal(new ArticlePage(select.getId(), main));
             }
         });
-        
+        validate.addClickShortcut(Key.ENTER);
         ComboBox categories = new ComboBox("Catégories");
         try {
             ArrayList<Categorie> a = bdd.getCategories(main.getSession().getCon());

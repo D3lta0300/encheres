@@ -4,6 +4,7 @@
  */
 package fr.insa.titouan.encheres.vaadinPages;
 
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.icon.Icon;
@@ -68,6 +69,7 @@ public class Welcome_entete extends HorizontalLayout {
             main.setPrincipal(new ShowArticles(main, searchField.getValue()));
             System.out.println("Voici la chaine de caractère retenue : '" + searchField.getValue() + "'");
         });
+        showObjects.addClickShortcut(Key.ENTER);
         searchField.setSuffixComponent(showObjects);
 
         Button createObject = new Button("Vendre un objet");

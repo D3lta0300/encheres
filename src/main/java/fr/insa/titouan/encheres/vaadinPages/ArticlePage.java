@@ -5,6 +5,7 @@
 package fr.insa.titouan.encheres.vaadinPages;
 
 import com.vaadin.flow.component.Html;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.details.Details;
 import com.vaadin.flow.component.html.Div;
@@ -80,6 +81,7 @@ public class ArticlePage extends HorizontalLayout {
                     }
                 }
             });
+            valider.addClickShortcut(Key.ENTER);
         } catch (SQLException ex) {
             Logger.getLogger(ArticlePage.class.getName()).log(Level.SEVERE, null, ex);
         }

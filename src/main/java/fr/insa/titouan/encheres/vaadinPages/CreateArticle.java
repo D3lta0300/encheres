@@ -8,6 +8,7 @@ package fr.insa.titouan.encheres.vaadinPages;
  *
  * @author magic
  */
+import com.vaadin.flow.component.Key;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import com.vaadin.flow.component.Text;
@@ -110,6 +111,7 @@ public class CreateArticle extends VerticalLayout {
             } catch (IOException | SQLException | NumberFormatException ex) {
                 Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
             }
+            send.addClickShortcut(Key.ENTER);
             Titre.clear();
             Description.clear();
             fin.clear();

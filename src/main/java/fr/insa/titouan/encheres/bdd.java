@@ -471,15 +471,14 @@ public class bdd {
 
     public static void addExample(Connection con) throws SQLException, NoSuchAlgorithmException {
         int[] categories = new int[2];
-        int[] users = new int[3];
+        int[] users = new int[2];
         int[] bids = new int[5];
         int[] articles = new int[3];
         try {
             categories[0] = addCategory(con, "Moustaches");
             categories[1] = addCategory(con, "Endomorphismes");
-            users[0] = addUser(con, new String[]{"Pelissier", "Jean", "mail.com", "motdp", "68007"});
-            users[1] = addUser(con, new String[]{"Plage", "Toto", "parsols@mer.com", "helloWorld", "TK8639"});
-            users[2] = addUser(con, new String[]{"Chèvre", "Gandolfi", "roi.des.vosges@caf.com", "helloWorld", "TK8639"});
+            users[0] = addUser(con, new String[]{"Plage", "Toto", "parsols@mer.com", "helloWorld", "TK8639"});
+            users[1] = addUser(con, new String[]{"Chèvre", "Gandolfi", "roi.des.vosges@caf.com", "helloWorld", "TK8639"});
             articles[0] = addArticle(con, "bâtons", "lexi ultra trail", Timestamp.valueOf("2020-02-25 13:46:57"), 158, users[2], categories[1], new byte[1]);
             articles[1] = addArticle(con, "noire", "a subit les méfait d'arthur", Timestamp.valueOf("2020-05-30 13:49:57"), 35, users[1], categories[0], new byte[1]);
             articles[2] = addArticle(con, "lunette de soleil", "majoritairement utilisé de nuit", Timestamp.valueOf("2021-07-12 07:56:57"), 182, users[1], categories[0], new byte[1]);
