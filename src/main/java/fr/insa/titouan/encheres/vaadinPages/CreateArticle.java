@@ -107,11 +107,7 @@ public class CreateArticle extends VerticalLayout {
                 ImageIO.write(bImage, "jpg", bos);
                 byte[] data = bos.toByteArray();
                 bdd.addArticle(main.getSession().getCon(), Titre.getValue(), Description.getValue(), ts, prix.getValue(), main.getSession().getUser(), Integer.parseInt(in), data);
-            } catch (IOException ex) {
-                Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (SQLException ex) {
-                Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (Exception ex) {
+            } catch (IOException | SQLException | NumberFormatException ex) {
                 Logger.getLogger(CreateArticle.class.getName()).log(Level.SEVERE, null, ex);
             }
             Titre.clear();

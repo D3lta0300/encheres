@@ -62,6 +62,7 @@ public class Welcome_entete extends HorizontalLayout {
         
         
         TextField searchField = new TextField();
+        searchField.setPlaceholder("Rechercher un article");
         Icon showObjects = new Icon("lumo", "search");
         showObjects.addClickListener((event) -> {
             main.setPrincipal(new ShowArticles(main, searchField.getValue()));
