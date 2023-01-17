@@ -33,10 +33,12 @@ public class CreateAccount extends FormLayout {
     private PasswordField verify;
     private Button send;
 
-    /***
+    /**
+     * *
      * Let create an Account. When account is created, set c component as main.
+     *
      * @param main
-     * @param c 
+     * @param c
      */
     public CreateAccount(VuePrincipale main, Component c) {
         this.prénom = new TextField("Quel est votre prénom ?");
@@ -62,6 +64,7 @@ public class CreateAccount extends FormLayout {
                 try {
                     main.getSession().setUser(bdd.addUser(main.getSession().getCon(), user));
                     main.setPrincipal(c);
+                    main.setEntete(new Welcome_entete(main));
                 } catch (SQLException ex) {
                     Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                     Notification.show("il y a une erreur de BdD");
@@ -81,13 +84,14 @@ public class CreateAccount extends FormLayout {
         this.setColspan(title, 2);
     }
 
-    
-    /***
+    /**
+     * *
      * Let create a bid and the create an account
+     *
      * @param main
      * @param c
      * @param articleID
-     * @param value 
+     * @param value
      */
     public CreateAccount(VuePrincipale main, Component c, int articleID, int value) {
         this.prénom = new TextField("Quel est votre prénom ?");
@@ -112,8 +116,9 @@ public class CreateAccount extends FormLayout {
                 user[4] = this.postalcode.getValue();
                 try {
                     main.getSession().setUser(bdd.addUser(main.getSession().getCon(), user));
-                    main.setPrincipal(c);
                     bdd.addBid(main.getSession().getCon(), main.getSession().getUser(), articleID, value);
+                    main.setEntete(new Welcome_entete(main));
+                    main.setPrincipal(c);
                 } catch (SQLException ex) {
                     Logger.getLogger(CreateAccount.class.getName()).log(Level.SEVERE, null, ex);
                     Notification.show("il y a une erreur de BdD");
