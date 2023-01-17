@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 public class ShowBids extends VerticalLayout{
     
     public ShowBids(VuePrincipale main){
-        this.add(new H3("Liste des enchères"));
+        this.add(new H3("Bienvenue sur PN - enchère ! Voici les enchère les plus récentes :"));
         try {
             this.add(new BidList(bdd.showBids(main.getSession().getCon())));
         } catch (SQLException ex) {

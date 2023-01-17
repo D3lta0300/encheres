@@ -20,7 +20,6 @@ package fr.insa.titouan.encheres.vaadinPages;
 
 import fr.insa.titouan.encheres.objects.Session;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -82,6 +81,7 @@ public class VuePrincipale extends VerticalLayout {
         try {
             session.setCon(bdd.defaultConnect());
             this.setEntete(new Welcome_entete(this));
+            this.setPrincipal(new ShowBids(this));
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(VuePrincipale.class.getName()).log(Level.SEVERE, null, ex);
             Notification.show("Something went wrong");
