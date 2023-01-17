@@ -30,7 +30,7 @@ public class UserIcon extends VerticalLayout {
 
         this.addClickListener((event) -> {
             if (this.state == -1) {
-                main.setPrincipal(new LogPage(main, new VerticalLayout()));
+                main.setPrincipal(new LogPage(main, new ShowBids(main)));
             } else {
                 main.getSession().setUser(-1);
                 main.setEntete(new Welcome_entete(main));
