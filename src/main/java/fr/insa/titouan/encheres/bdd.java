@@ -237,7 +237,8 @@ public class bdd {
                                             SELECT title, articles.id, (prenom || ' ' || nom) AS author, highest_bid
                                             FROM articles
                                             JOIN users ON created_by = users.id
-                                            WHERE title LIKE '%' || ? || '%'""")) {
+                                            WHERE title LIKE '%' || ? || '%'
+                                            ORDER BY highest_bid DESC""")) {
             st.setString(1, search);
             ResultSet res = st.executeQuery();
             while (res.next()) {
