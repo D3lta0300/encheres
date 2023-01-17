@@ -24,7 +24,7 @@ public class UserIcon extends VerticalLayout {
         if (this.state == -1) {
             text = new Label("Connexion");
         } else {
-            text = new Label("Not done yet");
+            text = new Label("Déconnexion");
         }
         this.add(text);
 
@@ -32,7 +32,9 @@ public class UserIcon extends VerticalLayout {
             if (this.state == -1) {
                 main.setPrincipal(new LogPage(main, new VerticalLayout()));
             } else {
-                Notification.show("Not done yet.");
+                main.getSession().setUser(-1);
+                main.setEntete(new Welcome_entete(main));
+                Notification.show("Vous êtes désormais déconnecté");
             }
         });
         
